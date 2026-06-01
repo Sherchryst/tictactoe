@@ -1,0 +1,25 @@
+rules:
+  game_domain_must_not_depend_on_outer_layers:
+    search_file_path_reg_exp: "lib/features/game/domain/.*\\.dart"
+    not_allow_import_reg_exps:
+      - "package:tictactoe/features/game/data/.*"
+      - "package:tictactoe/features/game/presentation/.*"
+      - "package:flutter/.*"
+      - "package:flutter_riverpod/.*"
+      - "package:go_router/.*"
+      - "package:shared_preferences/.*"
+    ignore_import_reg_exps: []
+
+  game_data_must_not_depend_on_presentation:
+    search_file_path_reg_exp: "lib/features/game/data/.*\\.dart"
+    not_allow_import_reg_exps:
+      - "package:tictactoe/features/game/presentation/.*"
+      - "package:flutter_riverpod/.*"
+      - "package:go_router/.*"
+    ignore_import_reg_exps: []
+
+  game_presentation_must_not_depend_on_data:
+    search_file_path_reg_exp: "lib/features/game/presentation/.*\\.dart"
+    not_allow_import_reg_exps:
+      - "package:tictactoe/features/game/data/.*"
+    ignore_import_reg_exps: []
