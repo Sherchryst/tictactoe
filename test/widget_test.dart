@@ -1,30 +1,64 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tictactoe/app.dart';
+import 'package:tictactoe/core/di/game_dependencies.dart';
+import 'package:tictactoe/features/game/presentation/game_copy.dart';
 
-import 'package:tictactoe/main.dart';
+import 'helpers/fake_key_value_storage.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  Future<void> pumpApp(WidgetTester tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          keyValueStorageProvider.overrideWithValue(FakeKeyValueStorage()),
+        ],
+        child: const TicTacToeApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+  }
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  testWidgets('shows the home actions and opens preferences', (tester) async {
+    await pumpApp(tester);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    expect(find.text(GameCopy.appTitle), findsOneWidget);
+    expect(find.text(GameCopy.localGameAction), findsOneWidget);
+    expect(find.text(GameCopy.aiGameAction), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.tap(find.text(GameCopy.settingsTitle));
+    await tester.pumpAndSettle();
+
+    expect(find.text(GameCopy.themeTitle), findsOneWidget);
+    expect(find.text(GameCopy.scoreTitle), findsOneWidget);
+  });
+
+  testWidgets('starts a local game in one tap', (tester) async {
+    await pumpApp(tester);
+
+    await tester.tap(find.text(GameCopy.localGameAction));
+    await tester.pumpAndSettle();
+
+    expect(find.text(GameCopy.humanVsHumanLabel), findsOneWidget);
+    expect(find.text(GameCopy.playerXScoreLabel), findsOneWidget);
+    expect(find.text(GameCopy.playerOScoreLabel), findsOneWidget);
+  });
+
+  testWidgets('asks for difficulty before starting an AI game', (tester) async {
+    await pumpApp(tester);
+
+    await tester.tap(find.text(GameCopy.aiGameAction));
+    await tester.pumpAndSettle();
+
+    expect(find.text(GameCopy.selectDifficultyTitle), findsOneWidget);
+    expect(find.text(GameCopy.easyLabel), findsOneWidget);
+    expect(find.text(GameCopy.hardLabel), findsOneWidget);
+
+    await tester.tap(find.text(GameCopy.hardLabel));
+    await tester.pumpAndSettle();
+
+    expect(find.text(GameCopy.humanVsCpuLabel), findsOneWidget);
+    expect(find.text(GameCopy.humanScoreLabel), findsOneWidget);
+    expect(find.text(GameCopy.cpuScoreLabel), findsOneWidget);
   });
 }
