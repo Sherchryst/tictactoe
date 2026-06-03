@@ -1,39 +1,69 @@
 # Tic Tac Toe
 
-An Elden Ring inspired Tic Tac Toe prototype built with Flutter.
+Application Flutter de Tic Tac Toe inspirée d'Elden Ring.
 
-The app keeps the game rules simple and local: a 3x3 duel can be played as
-Human vs CPU or Human vs Human. The presentation layer is intentionally more
-cinematic, with title/splash screens, menu transitions, themed audio, persisted
-settings, localized copy, and score tracking.
+Le jeu reste volontairement simple: un duel local sur une grille 3x3. Tout ce
+qui l'entoure a en revanche été travaillé comme une vraie mini-application:
+écrans cinématiques, audio, préférences persistées, score, localisation,
+design system et garde-fous d'architecture.
 
-## Features
+## Fonctionnalités
 
-- Local Tic Tac Toe on a 3x3 board
-- Human vs CPU and Human vs Human modes
-- CPU difficulties: easy, hard
-- Persisted scoreboard, audio preferences, and language preference
-- Localized UI copy in English, French, Spanish, and German
-- English is the default app locale, independent from the system locale
-- Themed title flow, loading flow, game board, settings, dialogs, splash, icons, audio, and visual effects
-- Iconic visual strings stay untranslated: `Tic Tac Toe`, `YOU DIED`, `GOD SLAIN`
+- Duel local en 3x3.
+- Mode `NEW DUEL`: joueur contre joueur sur le même appareil.
+- Mode `NEW GAME`: joueur contre CPU.
+- Difficultés CPU:
+  - `Guided`: coup légal aléatoire.
+  - `No Mercy`: stratégie minimax déterministe.
+- Score persistant pour les parties joueur contre CPU.
+- Réinitialisation du score via `Rest at Grace`.
+- Réglages persistants: musique, effets sonores, volumes et langue.
+- Interface localisée en anglais, français, espagnol et allemand.
+- Flux complet: splash, écran titre, menu, loading, partie, fin de partie,
+  score et système.
+- Audio via `just_audio`: musique en boucle, transitions, SFX préchauffés et
+  volume de sortie plafonné.
+- Build web compatible Firebase Hosting.
 
-## Run
+## Stack
 
-Generated files are reproducible local build outputs. Regenerate them before
-running the app or checks from a fresh clone.
+- Flutter / Dart
+- `hooks_riverpod` + génération Riverpod
+- `go_router`
+- `freezed`
+- `json_serializable`
+- `shared_preferences`
+- `just_audio`
+- `flutter_localizations`
+- `mockito`
+- `import_lint`
+
+Le projet cible le SDK Dart `^3.11.4`. L'environnement actuel a été vérifié
+avec Flutter `3.41.6` et Dart `3.11.4`.
+
+## Installation
+
+Depuis un clone propre:
 
 ```bash
 flutter pub get
 flutter gen-l10n
-dart run build_runner build
+dart run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
-For a real iPhone, Xcode signing must be configured with a valid Apple
-Development team and provisioning profile for the app bundle identifier.
+Exemples de cibles:
 
-## Quality Checks
+```bash
+flutter run -d chrome
+flutter run -d macos
+flutter run -d ios
+```
+
+Pour lancer sur un vrai iPhone, la signature Xcode doit être configurée avec
+une équipe Apple Development et un provisioning profile valides.
+
+## Commandes qualité
 
 ```bash
 dart format --set-exit-if-changed lib test
@@ -42,21 +72,117 @@ dart run import_lint
 flutter test
 ```
 
-When changing generated models or Riverpod providers, run:
+Après modification de providers, modèles Freezed, DTO JSON ou mocks:
 
 ```bash
-dart run build_runner build
+dart run build_runner build --delete-conflicting-outputs
 ```
 
-When changing translations, run:
+Après modification des fichiers `.arb`:
 
 ```bash
 flutter gen-l10n
 ```
 
-## Localization
+## Architecture
 
-Flutter's official localization pipeline is configured through `l10n.yaml`.
+Le projet suit une architecture par features, avec des dépendances orientées
+vers le domaine.
+
+```text
+lib/
+├── main.dart                         # Point d'entrée Flutter
+├── app.dart                          # MaterialApp, thème, locale, router
+├── l10n/                             # Sources de traduction ARB
+│   ├── app_en.arb
+│   ├── app_fr.arb
+│   ├── app_es.arb
+│   └── app_de.arb
+├── core/
+│   ├── audio/
+│   │   ├── domain/                   # Préférences, intents, contrats audio
+│   │   ├── data/                     # Repository local des préférences audio
+│   │   └── infrastructure/           # just_audio, cache, session audio
+│   ├── design_system/
+│   │   ├── theme/                    # AppTheme, AppPalette
+│   │   ├── tokens/                   # Assets, spacing, durées, typo, etc.
+│   │   └── widgets/                  # Widgets UI partagés
+│   ├── di/                           # Providers Riverpod transverses
+│   ├── router/                       # Routes go_router et transitions
+│   └── storage/                      # Abstraction KeyValueStorage
+└── features/
+    ├── shell/
+    │   └── presentation/             # Splash, title, home, loading
+    ├── game/
+    │   ├── domain/                   # Entités, règles, CPU, use cases
+    │   ├── data/                     # Scoreboard local
+    │   └── presentation/             # Page de jeu, board, dialogs, contrôleurs
+    └── settings/
+        ├── domain/                   # AppPreferences, use cases
+        ├── data/                     # Persistance locale des préférences
+        └── presentation/             # Écran système, audio, langue
+```
+
+Les règles principales:
+
+- `domain` reste pur Dart: pas de Flutter, Riverpod, router, storage concret ou DTO.
+- `data` implémente les repositories et gère la sérialisation/persistance.
+- `presentation` contient widgets, hooks, contrôleurs Riverpod, dialogs et animations.
+- `core/di` assemble les dépendances concrètes.
+- `core/design_system` reste indépendant des features.
+
+Les routes principales:
+
+```text
+/ → /title → /home → /game/loading → /game
+              └──→ /settings
+```
+
+## Domaine du jeu
+
+Le domaine du jeu se trouve dans `lib/features/game/domain`.
+
+- `Board`: grille immuable de neuf cellules.
+- `GameRules`: détection des victoires, égalités et parties en cours.
+- `PlayMove`: applique un coup valide.
+- `PlayHumanMove`: joue le coup humain puis déclenche le CPU si nécessaire.
+- `PlayCpuTurn`: choisit la stratégie CPU selon la difficulté.
+- `RandomCpuStrategy`: difficulté `Guided`.
+- `MinimaxCpuStrategy`: difficulté `No Mercy`.
+- `Scoreboard`: compteur des victoires, défaites, égalités et parties jouées.
+
+Le `GameController` enregistre le score uniquement en mode joueur contre CPU.
+Les duels joueur contre joueur ne modifient pas le scoreboard.
+
+## Persistance
+
+La persistance passe par `KeyValueStorage`, implémenté avec
+`SharedPreferencesAsync`.
+
+Données persistées:
+
+- scoreboard solo;
+- préférences audio;
+- langue sélectionnée.
+
+Cette abstraction permet de tester les repositories avec un storage en mémoire
+sans importer `shared_preferences` dans les couches métier ou présentation.
+
+## Audio
+
+La présentation déclenche des intentions audio, pas des chemins d'assets.
+
+- Menu: `MenuSfx.select`, `MenuSfx.activate`, `MenuSfx.reset`.
+- Musique: `MusicTrack.menu`, `MusicTrack.game`.
+- Partie: coup joué, parry, victoire, mort, égalité, redémarrage.
+
+`AppAudioController` mappe ces intentions vers `AppAssets`. La musique passe
+par un player en boucle avec fade. Les SFX utilisent un petit pool de players
+pour permettre les sons courts rapprochés.
+
+## Localisation
+
+La configuration Flutter se trouve dans `l10n.yaml`.
 
 ```text
 lib/l10n/
@@ -66,169 +192,81 @@ lib/l10n/
 └── app_de.arb
 ```
 
-Visible UI copy goes through `GameCopy.of(context)` so widgets stay decoupled
-from raw generated localization classes. `GameCopy` is a thin facade over
-three resolvers that handle the structured logic:
-
-- `PlayerLabelResolver` — score, turn, and win labels per `(Player, GameMode)`
-- `GameStatusResolver` — board status string per `(GameResult, Player, GameMode)`
-- `SystemHelpResolver` — focus-aware help copy for the settings screen
-
-The selected language is stored in `AppPreferences.localePreference` and can
-be changed from `SYSTEM > Language`. The app deliberately starts in English by
-default instead of following the device locale.
-
-## Architecture
-
-The project follows Clean Architecture with feature-first organization and
-dependencies pointing inward. Wiring lives in `lib/app/`, shared building
-blocks in `lib/core/`, and feature modules in `lib/features/`.
-
-```text
-lib/
-├── app/
-│   ├── di/            # Riverpod providers wiring concrete dependencies
-│   └── router/        # GoRouter configuration
-├── core/
-│   ├── assets/        # Asset path constants
-│   ├── design/        # Design tokens (spacing, radius, durations, ...)
-│   ├── storage/       # KeyValueStorage abstraction + SharedPreferences impl
-│   ├── theme/         # AppTheme, AppPalette
-│   └── ui/            # Shared widgets (AppPressable, AppIconButton, hero tags)
-├── features/
-│   └── game/
-│       ├── domain/
-│       │   ├── entities/     # Pure data + intents (MenuSfx, MusicTrack, ...)
-│       │   ├── repositories/ # Abstract repository contracts
-│       │   ├── services/     # GameRules, CpuStrategy, MusicPlayer, SfxPlayer
-│       │   └── usecases/     # StartGame, PlayMove, PlayCpuTurn, ...
-│       ├── data/
-│       │   ├── datasources/  # KeyValueStorage adapters and storage keys
-│       │   ├── models/       # JSON DTOs
-│       │   ├── repositories/ # Concrete repositories with mutation queues
-│       │   └── services/     # JustAudio music/sfx players, asset cache, etc.
-│       └── presentation/
-│           ├── controllers/  # Riverpod notifiers / view-state controllers
-│           ├── copy/         # Resolvers backing GameCopy
-│           ├── dialogs/      # Modal flows
-│           ├── pages/        # Top-level screens
-│           ├── settings/     # Settings sub-feature
-│           └── widgets/      # Reusable UI components
-└── l10n/
-```
-
-### Domain
-
-Pure Dart. No Flutter, Riverpod, storage, routing, or DTO imports.
-
-It owns the business concepts (`Board`, `GameSession`, `Scoreboard`, ...), the
-abstract repositories, the gameplay services (`GameRules`, CPU strategies,
-`CpuStrategyResolver`), the audio service contracts (`MusicPlayer`, `SfxPlayer`,
-`AudioSettingsRepository`), and the use cases:
-
-- `StartGame`, `StartNewRound`
-- `PlayMove`, `PlayCpuTurn`, `PlayHumanMove` (composed from the previous two)
-- `LoadScoreboard`, `RecordGameOutcome`, `ResetScoreboard`
-- `LoadPreferences`, `SavePreferences`
-
-### Data
-
-Implements domain repository contracts and audio service contracts. JSON
-mapping goes through `json_serializable` DTOs and persistence relies on the
-abstract `KeyValueStorage`. Repositories serialize concurrent writes through a
-small mutation queue to avoid lost updates. Audio playback is split into:
-
-- `JustAudioMusicPlayer` — single-track playback with cross-fade transitions
-- `JustAudioSfxPlayer` — short-effect playback through a small player pool
-- `AudioAssetCache` — caches asset existence checks
-- `AudioSessionConfigurator` — configures the platform `AudioSession` once
-- `LocalAudioSettingsRepository` — persists `GameAudioSettings`
-
-### Presentation
-
-Flutter UI, hooks, and Riverpod controllers. Presentation depends on use cases
-through `app/di/game_dependencies.dart`, never on concrete repositories.
-
-The splash, title, home, loading, game, and settings screens all live under
-the game presentation layer. There is no separate `home` feature because it
-would not own domain behavior; it would only wrap navigation.
-
-Local animation and transient visual state stay in hooks. App state,
-repositories, settings, audio orchestration, and game state are owned by
-Riverpod providers/controllers.
-
-## Design System
-
-`lib/design_system/tokens/` exposes atomic tokens (spacing, radius, durations,
-curves, alphas, shadows, gradients, typography, breakpoints, animations) and
-bundles them into an `AppTokens` `ThemeExtension` registered by
-`AppTheme.dark()` (`lib/design_system/theme/`). Reusable widgets live under
-`lib/design_system/widgets/`. `lib/core/` keeps only framework-agnostic
-infrastructure (storage abstraction, asset path constants).
-
-Widgets read tokens through `AppPalette`, `AppShadows`, `AppTypography`, etc.
-instead of hard-coding colors, durations, or shadows.
-
-Typography uses two font families:
-
-- `AppPalette.titleFont = 'Mantinia'` — bundled display face
-- `AppPalette.serifFont = 'serif'` — system serif fallback (resolves per platform)
-
-## State Management
-
-The app uses `hooks_riverpod` with Riverpod code generation.
-
-- `@riverpod` providers wire dependencies, controllers, and use cases.
-- `HookConsumerWidget` is used where widgets need both providers and local hook state.
-- `HookWidget` is used for purely local animated widgets.
-- Domain logic remains framework-free.
-
-## Audio Intents
-
-Presentation never names a concrete asset or volume. UI screens dispatch
-stable intents on the audio controller:
-
-- `playMenuSfx(MenuSfx.select | activate | reset)` for menu interactions
-- `playTrack(MusicTrack.menu | game)` for music transitions
-
-In-game intents (`playMove`, `playParry`, `playVictory`, `playDeath`,
-`playDeathIntro`, `playDraw`, `playRestart`) live on the same `AudioController`
-interface and are consumed by `GameAudioEffects`.
-
-## CPU Strategies
-
-- Easy: random legal move
-- Hard: minimax, deterministic and tested
-
-`CpuStrategyResolver` maps `GameDifficulty` to a concrete strategy and is
-injected through Riverpod, which keeps tests free to swap strategies.
-
-## Architecture Guards
-
-`import_lint` runs from `import_lint.yaml` and prevents boundary violations:
-
-- domain cannot import data, presentation, Flutter, Riverpod, GoRouter, or SharedPreferences
-- data cannot import presentation, Flutter widgets/material, or GoRouter
-- presentation cannot import data implementations directly (audio controller exempted)
-
-## Generated Code Policy
-
-`*.freezed.dart` and `*.g.dart` are ignored by Git. They are reproducible
-build outputs and must be regenerated with:
-
-```bash
-dart run build_runner build
-```
-
-Flutter localization output is regenerated with:
+Les fichiers générés `app_localizations*.dart` ne sont pas versionnés. Ils se
+regénèrent avec:
 
 ```bash
 flutter gen-l10n
 ```
 
-## Non-Regression Notes
+La langue par défaut est l'anglais, même si la langue système est différente.
+Le choix utilisateur est stocké dans `AppPreferences.localePreference`.
 
-Gameplay, audio timings, animation timings, navigation transitions, dialogs,
-layout, and visual style are intentionally treated as stable behavior. Changes
-to localization or settings should not alter the duel flow unless the change
-is explicitly requested.
+## Code généré
+
+Ces fichiers sont ignorés par Git:
+
+- `*.freezed.dart`
+- `*.g.dart`
+- `lib/l10n/app_localizations*.dart`
+- sorties de build Flutter
+
+Commande de régénération complète:
+
+```bash
+flutter gen-l10n
+dart run build_runner build --delete-conflicting-outputs
+```
+
+`build.yaml` limite la génération Mockito aux fichiers de test et de support.
+
+## Tests
+
+```text
+test/
+├── core/audio/                       # Audio domain/data/infrastructure
+├── features/game/                    # Domaine, data et contrôleurs du jeu
+├── features/settings/                # Préférences et contrôleurs settings
+├── testing/                          # Mocks, stubs, storage mémoire
+└── widget_test.dart
+```
+
+Les tests suivent les couches de l'application:
+
+- domaine: entités, règles, stratégies CPU, use cases;
+- data: DTO, data sources, repositories;
+- présentation: contrôleurs Riverpod et états exposés.
+
+## Garde-fous d'imports
+
+`import_lint.yaml` protège les frontières principales:
+
+- le domaine des features ne dépend pas de Flutter, Riverpod, data ou présentation;
+- la data ne dépend pas de la présentation;
+- la présentation n'importe pas les implémentations data;
+- `core/audio/domain` reste indépendant de l'infrastructure;
+- `core/design_system` reste indépendant des features;
+- `features/settings` ne dépend pas de `features/game`.
+
+À lancer avec:
+
+```bash
+dart run import_lint
+```
+
+## Web et Firebase
+
+Firebase Hosting sert le build web depuis `build/web` et redirige toutes les
+routes vers `index.html`, ce qui permet aux routes `go_router` de fonctionner
+au refresh.
+
+```bash
+flutter build web --release
+firebase deploy --only hosting
+```
+
+## Assets
+
+Les assets exposés à l'application sont centralisés dans `AppAssets`. Les
+fichiers sources vivent dans `assets/elden_ring/` et sont déclarés dans
+`pubspec.yaml`.
