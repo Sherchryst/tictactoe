@@ -17,6 +17,7 @@ import 'package:tictactoe/core/design_system/widgets/sigil_backdrop.dart';
 import 'package:tictactoe/features/game/domain/entities/board.dart';
 import 'package:tictactoe/features/game/domain/entities/cell.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
+import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/domain/entities/player.dart';
 import 'package:tictactoe/features/game/presentation/utils/rendering/game_board_painters.dart';
 
@@ -28,12 +29,14 @@ class GameBoard extends HookWidget {
     required this.board,
     required this.result,
     required this.onCellPressed,
+    required this.mode,
     super.key,
   });
 
   final Board board;
   final GameResult result;
   final ValueChanged<int> onCellPressed;
+  final GameMode mode;
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +118,7 @@ class GameBoard extends HookWidget {
 
                       return _GameCell(
                         cell: board.cellAt(index),
+                        mode: mode,
                         highlighted: winningCells.contains(index),
                         enabled: result.isOngoing && canPlace,
                         onPressed: () => handleCellPressed(index),

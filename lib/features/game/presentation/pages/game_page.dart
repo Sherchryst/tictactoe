@@ -130,6 +130,7 @@ class GamePage extends ConsumerWidget {
                             child: GameBoard(
                               board: game.session.board,
                               result: game.session.result,
+                              mode: game.session.mode,
                               onCellPressed: ref
                                   .read(gameControllerProvider.notifier)
                                   .playCell,

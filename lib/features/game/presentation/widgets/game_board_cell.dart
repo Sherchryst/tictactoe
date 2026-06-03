@@ -3,12 +3,14 @@ part of 'game_board.dart';
 class _GameCell extends HookWidget {
   const _GameCell({
     required this.cell,
+    required this.mode,
     required this.highlighted,
     required this.enabled,
     required this.onPressed,
   });
 
   final Cell cell;
+  final GameMode mode;
   final bool highlighted;
   final bool enabled;
   final VoidCallback onPressed;
@@ -69,7 +71,12 @@ class _GameCell extends HookWidget {
                     ),
                     child: const SizedBox.expand(),
                   ),
-                RepaintBoundary(child: _Mark(cell: cell)),
+                RepaintBoundary(
+                  child: _Mark(
+                    cell: cell,
+                    mode: mode,
+                  ),
+                ),
               ],
             ),
           ),
@@ -101,15 +108,18 @@ class _MarkHalo extends StatelessWidget {
 }
 
 class _Mark extends StatelessWidget {
-  const _Mark({required this.cell});
+  const _Mark({required this.cell, required this.mode});
 
   final Cell cell;
+  final GameMode mode;
 
   @override
   Widget build(BuildContext context) {
     final asset = switch (cell) {
       Cell.human => AppAssets.markX,
-      Cell.cpu => AppAssets.markO,
+      Cell.cpu => mode == GameMode.humanVsCpu
+          ? AppAssets.malenia
+          : AppAssets.markO,
       Cell.empty => null,
     };
 

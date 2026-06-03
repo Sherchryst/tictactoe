@@ -6,6 +6,7 @@ import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
 import 'package:tictactoe/core/design_system/widgets/tic_tac_toe_title_logo.dart';
 import 'package:tictactoe/core/di/storage_providers.dart';
 import 'package:tictactoe/features/game/domain/entities/board.dart';
+import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/presentation/widgets/game_board.dart';
 import 'package:tictactoe/l10n/app_localizations_en.dart';
@@ -16,6 +17,7 @@ import 'testing/in_memory_key_value_storage.dart';
 void main() {
   final en = AppLocalizationsEn();
   final fr = AppLocalizationsFr();
+  const soloOpponentLabel = 'MELANIAA BLADE OF MEQUILLA';
 
   Future<void> pumpApp(WidgetTester tester) async {
     await tester.pumpWidget(
@@ -192,6 +194,7 @@ void main() {
               child: GameBoard(
                 board: Board.empty(),
                 result: const GameResult.ongoing(),
+                mode: GameMode.humanVsCpu,
                 onCellPressed: pressedCells.add,
               ),
             ),
@@ -232,6 +235,11 @@ void main() {
 
     expect(find.text(en.humanVsCpuLabel), findsNothing);
     expect(find.text(en.humanTurnStatus), findsOneWidget);
-    expect(find.text(en.cpuTurnStatus), findsOneWidget);
+    expect(find.text(soloOpponentLabel), findsOneWidget);
+
+    final malenia = tester.widget<Image>(
+      find.image(const AssetImage(AppAssets.malenia)),
+    );
+    expect(malenia.opacity?.value, 1);
   });
 }
