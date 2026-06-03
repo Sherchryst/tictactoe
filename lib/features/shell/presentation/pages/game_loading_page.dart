@@ -1,30 +1,29 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import 'package:tictactoe/app/di/audio_providers.dart';
-import 'package:tictactoe/app/router/app_routes.dart';
-import 'package:tictactoe/app/router/hero_tags.dart';
-import 'package:tictactoe/design_system/theme/app_palette.dart';
-import 'package:tictactoe/design_system/tokens/app_alphas.dart';
-import 'package:tictactoe/design_system/tokens/app_animations.dart';
-import 'package:tictactoe/design_system/tokens/app_durations.dart';
-import 'package:tictactoe/design_system/tokens/app_gradients.dart';
-import 'package:tictactoe/design_system/tokens/app_spacing.dart';
-import 'package:tictactoe/design_system/widgets/ambient_motes.dart';
-import 'package:tictactoe/design_system/widgets/fog_veil.dart';
-import 'package:tictactoe/design_system/widgets/gilded_text.dart';
-import 'package:tictactoe/design_system/widgets/grace_glow.dart';
-import 'package:tictactoe/design_system/widgets/rune_diamond.dart';
-import 'package:tictactoe/design_system/widgets/sigil_backdrop.dart';
-import 'package:tictactoe/design_system/widgets/tic_tac_toe_title_logo.dart';
-import 'package:tictactoe/features/game/domain/entities/music_track.dart';
-import 'package:tictactoe/features/game/presentation/game_copy.dart';
-import 'package:tictactoe/features/game/presentation/widgets/loading/loading_beam.dart';
+import 'package:tictactoe/core/audio/domain/entities/music_track.dart';
+import 'package:tictactoe/core/design_system/theme/app_palette.dart';
+import 'package:tictactoe/core/design_system/tokens/app_alphas.dart';
+import 'package:tictactoe/core/design_system/tokens/app_animations.dart';
+import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
+import 'package:tictactoe/core/design_system/tokens/app_gradients.dart';
+import 'package:tictactoe/core/design_system/tokens/app_spacing.dart';
+import 'package:tictactoe/core/design_system/widgets/ambient_motes.dart';
+import 'package:tictactoe/core/design_system/widgets/fog_veil.dart';
+import 'package:tictactoe/core/design_system/widgets/gilded_text.dart';
+import 'package:tictactoe/core/design_system/widgets/grace_glow.dart';
+import 'package:tictactoe/core/design_system/widgets/rune_diamond.dart';
+import 'package:tictactoe/core/design_system/widgets/sigil_backdrop.dart';
+import 'package:tictactoe/core/design_system/widgets/tic_tac_toe_title_logo.dart';
+import 'package:tictactoe/core/di/audio_providers.dart';
+import 'package:tictactoe/core/router/app_routes.dart';
+import 'package:tictactoe/core/router/hero_tags.dart';
+import 'package:tictactoe/features/shell/presentation/rendering/loading_seal_ring_painter.dart';
+import 'package:tictactoe/features/shell/presentation/widgets/loading/loading_beam.dart';
+import 'package:tictactoe/l10n/app_localizations.dart';
 
 class GameLoadingPage extends HookConsumerWidget {
   const GameLoadingPage({super.key});
@@ -42,7 +41,7 @@ class GameLoadingPage extends HookConsumerWidget {
     }, const []);
 
     final screen = MediaQuery.sizeOf(context);
-    final copy = GameCopy.of(context);
+    final l10n = AppLocalizations.of(context);
     final logoFontSize = (screen.shortestSide * 0.13)
         .clamp(46.0, 60.0)
         .toDouble();
@@ -79,8 +78,8 @@ class GameLoadingPage extends HookConsumerWidget {
               animation: controller,
               screen: screen,
               logoFontSize: logoFontSize,
-              title: copy.loadingTitle,
-              footer: copy.loadingFooter,
+              title: l10n.loadingTitle,
+              footer: l10n.loadingFooter,
             ),
           ],
         ),
@@ -209,7 +208,7 @@ class _LoadingSigil extends StatelessWidget {
                 Opacity(opacity: opacity, child: child),
                 SizedBox.square(
                   dimension: size * 0.52,
-                  child: CustomPaint(painter: _SealRingPainter(progress)),
+                  child: CustomPaint(painter: LoadingSealRingPainter(progress)),
                 ),
               ],
             ),
@@ -218,61 +217,6 @@ class _LoadingSigil extends StatelessWidget {
         child: SigilBackdrop(height: size),
       ),
     );
-  }
-}
-
-class _SealRingPainter extends CustomPainter {
-  const _SealRingPainter(this.progress);
-
-  final double progress;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = size.center(Offset.zero);
-    final radius = size.shortestSide / 2;
-    final eased = Curves.easeInOutCubic.transform(progress);
-
-    final track = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1
-      ..color = AppPalette.gold.withValues(alpha: AppAlphas.subtle);
-    canvas.drawCircle(center, radius, track);
-    canvas.drawCircle(center, radius * 0.9, track);
-
-    final seal = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = 1.6
-      ..color = AppPalette.goldBright.withValues(alpha: AppAlphas.prominent)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.4);
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      math.pi * 2 * eased,
-      false,
-      seal,
-    );
-
-    final tick = Paint()
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = 1.4
-      ..color = AppPalette.gold.withValues(alpha: AppAlphas.muted);
-    const count = 24;
-    final rotation = eased * math.pi * 0.5;
-    for (var index = 0; index < count; index++) {
-      final angle = rotation + index * math.pi * 2 / count;
-      final inner = index.isEven ? radius * 0.9 : radius * 0.94;
-      canvas.drawLine(
-        center + Offset(math.cos(angle), math.sin(angle)) * inner,
-        center + Offset(math.cos(angle), math.sin(angle)) * radius,
-        tick,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _SealRingPainter oldDelegate) {
-    return oldDelegate.progress != progress;
   }
 }
 

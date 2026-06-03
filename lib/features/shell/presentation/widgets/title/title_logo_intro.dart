@@ -1,10 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:tictactoe/app/router/hero_tags.dart';
-import 'package:tictactoe/design_system/tokens/app_animations.dart';
-import 'package:tictactoe/design_system/widgets/tic_tac_toe_title_logo.dart';
-import 'package:tictactoe/features/game/presentation/widgets/title/title_logo_prelude_glow.dart';
+import 'package:tictactoe/core/design_system/tokens/app_animations.dart';
+import 'package:tictactoe/core/design_system/widgets/tic_tac_toe_title_logo.dart';
+import 'package:tictactoe/core/router/hero_tags.dart';
+import 'package:tictactoe/features/shell/presentation/widgets/title/title_logo_prelude_glow.dart';
 
 class TitleLogoIntro extends StatelessWidget {
   const TitleLogoIntro({required this.controller, super.key});

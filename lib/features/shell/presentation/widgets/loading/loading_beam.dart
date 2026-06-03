@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'package:tictactoe/design_system/theme/app_palette.dart';
-import 'package:tictactoe/design_system/widgets/selection_glow.dart';
+import 'package:tictactoe/core/design_system/widgets/selection_glow.dart';
+import 'package:tictactoe/features/shell/presentation/rendering/loading_beam_painter.dart';
 
 class LoadingBeam extends StatelessWidget {
   const LoadingBeam({required this.progress, super.key});
@@ -48,7 +48,7 @@ class LoadingBeam extends StatelessWidget {
             ),
             CustomPaint(
               size: Size(width, 42),
-              painter: _LoadingBeamPainter(easedProgress),
+              painter: LoadingBeamPainter(easedProgress),
             ),
           ],
         ),
@@ -119,62 +119,5 @@ class _SoftProgressReveal extends StatelessWidget {
       },
       child: child,
     );
-  }
-}
-
-class _LoadingBeamPainter extends CustomPainter {
-  const _LoadingBeamPainter(this.progress);
-
-  final double progress;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final clampedProgress = progress.clamp(0.0, 1.0);
-    if (clampedProgress == 0) {
-      return;
-    }
-
-    final center = size.center(Offset.zero);
-    final lineWidth = size.width * clampedProgress;
-    final lineRect = Rect.fromCenter(
-      center: center,
-      width: lineWidth,
-      height: size.height,
-    );
-    final haloPaint = Paint()
-      ..shader = const LinearGradient(
-        colors: [Colors.transparent, AppPalette.goldBright, Colors.transparent],
-      ).createShader(lineRect)
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = math.max(6, size.height * 0.22)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 9);
-    final corePaint = Paint()
-      ..shader = const LinearGradient(
-        colors: [
-          Colors.transparent,
-          AppPalette.gold,
-          AppPalette.ivoryText,
-          AppPalette.gold,
-          Colors.transparent,
-        ],
-      ).createShader(lineRect)
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = math.max(1.8, size.height * 0.08);
-
-    canvas.drawLine(
-      Offset(center.dx - lineWidth * 0.5, center.dy),
-      Offset(center.dx + lineWidth * 0.5, center.dy),
-      haloPaint,
-    );
-    canvas.drawLine(
-      Offset(center.dx - lineWidth * 0.48, center.dy),
-      Offset(center.dx + lineWidth * 0.48, center.dy),
-      corePaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_LoadingBeamPainter oldDelegate) {
-    return oldDelegate.progress != progress;
   }
 }

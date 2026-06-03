@@ -4,18 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import 'package:tictactoe/app/di/audio_providers.dart';
-import 'package:tictactoe/app/router/app_routes.dart';
-import 'package:tictactoe/design_system/theme/app_palette.dart';
-import 'package:tictactoe/design_system/tokens/app_durations.dart';
-import 'package:tictactoe/design_system/widgets/ambient_motes.dart';
-import 'package:tictactoe/features/game/domain/entities/menu_sfx.dart';
-import 'package:tictactoe/features/game/domain/entities/music_track.dart';
-import 'package:tictactoe/features/game/presentation/game_copy.dart';
-import 'package:tictactoe/features/game/presentation/widgets/title/title_background.dart';
-import 'package:tictactoe/features/game/presentation/widgets/title/title_logo_intro.dart';
-import 'package:tictactoe/features/game/presentation/widgets/title/title_touch_prompt.dart';
+import 'package:tictactoe/core/audio/domain/entities/menu_sfx.dart';
+import 'package:tictactoe/core/audio/domain/entities/music_track.dart';
+import 'package:tictactoe/core/design_system/theme/app_palette.dart';
+import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
+import 'package:tictactoe/core/design_system/widgets/ambient_motes.dart';
+import 'package:tictactoe/core/di/audio_providers.dart';
+import 'package:tictactoe/core/router/app_routes.dart';
+import 'package:tictactoe/features/shell/presentation/widgets/title/title_background.dart';
+import 'package:tictactoe/features/shell/presentation/widgets/title/title_logo_intro.dart';
+import 'package:tictactoe/features/shell/presentation/widgets/title/title_touch_prompt.dart';
+import 'package:tictactoe/l10n/app_localizations.dart';
 
 class TitlePage extends HookConsumerWidget {
   const TitlePage({super.key});
@@ -97,7 +96,7 @@ class TitlePage extends HookConsumerWidget {
     }, const []);
 
     final screen = MediaQuery.sizeOf(context);
-    final copy = GameCopy.of(context);
+    final l10n = AppLocalizations.of(context);
     final logoTop = screen.height * 0.31;
     final sigilSize = (screen.shortestSide * 1.26).clamp(430.0, 650.0);
 
@@ -131,7 +130,7 @@ class TitlePage extends HookConsumerWidget {
                     child: FadeTransition(
                       opacity: promptController,
                       child: TitleTouchPrompt(
-                        label: copy.touchScreenPrompt,
+                        label: l10n.touchScreenPrompt,
                         pressAnimation: pressController,
                       ),
                     ),

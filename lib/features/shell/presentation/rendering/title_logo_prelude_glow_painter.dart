@@ -1,18 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:tictactoe/core/design_system/theme/app_palette.dart';
 
-import 'package:tictactoe/design_system/theme/app_palette.dart';
-
-class TitleLogoPreludeGlow extends StatelessWidget {
-  const TitleLogoPreludeGlow({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(painter: _TitleLogoPreludeGlowPainter());
-  }
-}
-
-class _TitleLogoPreludeGlowPainter extends CustomPainter {
-  const _TitleLogoPreludeGlowPainter();
+final class TitleLogoPreludeGlowPainter extends CustomPainter {
+  const TitleLogoPreludeGlowPainter();
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -47,7 +37,7 @@ class _TitleLogoPreludeGlowPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _TitleLogoPreludeGlowPainter oldDelegate) {
+  bool shouldRepaint(covariant TitleLogoPreludeGlowPainter oldDelegate) {
     return false;
   }
 }

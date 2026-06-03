@@ -4,25 +4,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tictactoe/app/di/audio_providers.dart';
-import 'package:tictactoe/app/router/app_routes.dart';
-import 'package:tictactoe/app/router/hero_tags.dart';
-import 'package:tictactoe/design_system/theme/app_palette.dart';
-import 'package:tictactoe/design_system/tokens/app_durations.dart';
-import 'package:tictactoe/design_system/widgets/sigil_backdrop.dart';
-import 'package:tictactoe/design_system/widgets/tic_tac_toe_title_logo.dart';
-import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
-import 'package:tictactoe/features/game/domain/entities/menu_sfx.dart';
-import 'package:tictactoe/features/game/domain/entities/music_track.dart';
-import 'package:tictactoe/features/game/presentation/controllers/game_controller.dart';
-import 'package:tictactoe/features/game/presentation/game_copy.dart';
-import 'package:tictactoe/features/game/presentation/widgets/home/difficulty_dialog.dart';
-import 'package:tictactoe/features/game/presentation/widgets/home/home_entrance.dart';
-import 'package:tictactoe/features/game/presentation/widgets/home/home_menu_action.dart';
-import 'package:tictactoe/features/game/presentation/widgets/home/title_menu.dart';
+import 'package:tictactoe/core/audio/domain/entities/menu_sfx.dart';
+import 'package:tictactoe/core/audio/domain/entities/music_track.dart';
+import 'package:tictactoe/core/design_system/theme/app_palette.dart';
+import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
+import 'package:tictactoe/core/design_system/widgets/sigil_backdrop.dart';
+import 'package:tictactoe/core/design_system/widgets/tic_tac_toe_title_logo.dart';
+import 'package:tictactoe/core/di/audio_providers.dart';
+import 'package:tictactoe/core/router/app_routes.dart';
+import 'package:tictactoe/core/router/hero_tags.dart';
+import 'package:tictactoe/features/shell/presentation/models/solo_challenge.dart';
+import 'package:tictactoe/features/shell/presentation/widgets/home/difficulty_dialog.dart';
+import 'package:tictactoe/features/shell/presentation/widgets/home/home_entrance.dart';
+import 'package:tictactoe/features/shell/presentation/widgets/home/home_menu_action.dart';
+import 'package:tictactoe/features/shell/presentation/widgets/home/title_menu.dart';
 
 class HomePage extends HookConsumerWidget {
-  const HomePage({super.key});
+  const HomePage({
+    required this.onStartLocalDuel,
+    required this.onStartSoloChallenge,
+    required this.onShowScoreboard,
+    super.key,
+  });
+
+  final Future<void> Function(BuildContext context) onStartLocalDuel;
+  final Future<void> Function(BuildContext context, SoloChallenge challenge)
+  onStartSoloChallenge;
+  final Future<void> Function(BuildContext context) onShowScoreboard;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,23 +40,14 @@ class HomePage extends HookConsumerWidget {
     final selectedAction = useState(HomeMenuAction.duel);
     final pressedAction = useState<HomeMenuAction?>(null);
     final transitioning = useState(false);
-    final copy = GameCopy.of(context);
-
-    Future<void> startGame(GameSetup setup) async {
-      ref.read(gameControllerProvider.notifier).startGame(setup);
-
-      if (context.mounted) {
-        context.go(AppRoutes.gameLoadingLocation);
-      }
-    }
 
     Future<void> chooseAiDifficulty() async {
-      final difficulty = await DifficultyDialog.show(context);
-      if (!context.mounted || difficulty == null) {
+      final challenge = await DifficultyDialog.show(context);
+      if (!context.mounted || challenge == null) {
         return;
       }
 
-      await startGame(GameSetup(difficulty: difficulty));
+      await onStartSoloChallenge(context, challenge);
     }
 
     Future<void> handleMenuSelection(HomeMenuAction action) async {
@@ -70,9 +69,11 @@ class HomePage extends HookConsumerWidget {
 
       switch (action) {
         case HomeMenuAction.duel:
-          await startGame(const GameSetup(mode: GameMode.humanVsHuman));
+          await onStartLocalDuel(context);
         case HomeMenuAction.solo:
           await chooseAiDifficulty();
+        case HomeMenuAction.score:
+          await onShowScoreboard(context);
         case HomeMenuAction.system:
           context.go(AppRoutes.settingsLocation);
       }
@@ -139,7 +140,6 @@ class HomePage extends HookConsumerWidget {
                 end: 0.92,
                 offset: const Offset(0, 24),
                 child: TitleMenu(
-                  copy: copy,
                   selectedAction: selectedAction.value,
                   pressedAction: pressedAction.value,
                   onSelected: handleMenuSelection,

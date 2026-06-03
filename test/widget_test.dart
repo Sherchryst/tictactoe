@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tictactoe/app.dart';
-import 'package:tictactoe/app/di/game_dependencies.dart';
-import 'package:tictactoe/core/assets/app_assets.dart';
-import 'package:tictactoe/core/storage/in_memory_key_value_storage.dart';
-import 'package:tictactoe/design_system/widgets/tic_tac_toe_title_logo.dart';
+import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
+import 'package:tictactoe/core/design_system/widgets/tic_tac_toe_title_logo.dart';
+import 'package:tictactoe/core/di/storage_providers.dart';
 import 'package:tictactoe/features/game/domain/entities/board.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/presentation/widgets/game_board.dart';
 import 'package:tictactoe/l10n/app_localizations_en.dart';
 import 'package:tictactoe/l10n/app_localizations_fr.dart';
+
+import 'testing/in_memory_key_value_storage.dart';
 
 void main() {
   final en = AppLocalizationsEn();
@@ -96,13 +97,26 @@ void main() {
     expect(find.byType(TicTacToeTitleLogo), findsWidgets);
     expect(find.text(en.localGameAction), findsOneWidget);
     expect(find.text(en.aiGameAction), findsOneWidget);
+    expect(find.text(en.scoreTitle), findsOneWidget);
 
     await tester.tap(find.text(en.settingsTitle));
     await tester.pumpAndSettle();
 
     expect(find.text(en.audioTitle), findsOneWidget);
     expect(find.text(en.languageTitle), findsOneWidget);
-    expect(find.text(en.scoreTitle), findsOneWidget);
+    expect(find.text(en.scoreTitle), findsNothing);
+  });
+
+  testWidgets('opens the score dialog from home', (tester) async {
+    await pumpApp(tester);
+    await enterHome(tester);
+
+    await tester.tap(find.text(en.scoreTitle));
+    await tester.pumpAndSettle();
+
+    expect(find.text(en.recordTitle), findsOneWidget);
+    expect(find.text(en.humanScoreLabel), findsOneWidget);
+    expect(find.text(en.resetScoreAction), findsOneWidget);
   });
 
   testWidgets('changes the interface language from system settings', (

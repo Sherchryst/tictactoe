@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'package:tictactoe/design_system/theme/app_palette.dart';
-import 'package:tictactoe/design_system/widgets/sigil_backdrop.dart';
+import 'package:tictactoe/core/design_system/theme/app_palette.dart';
+import 'package:tictactoe/core/design_system/widgets/sigil_backdrop.dart';
 
 class TitleBackground extends StatelessWidget {
   const TitleBackground({

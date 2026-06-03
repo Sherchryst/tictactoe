@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:tictactoe/design_system/tokens/app_typography.dart';
-import 'package:tictactoe/design_system/widgets/menu_selection_beam.dart';
+import 'package:tictactoe/core/design_system/tokens/app_typography.dart';
+import 'package:tictactoe/core/design_system/widgets/menu_selection_beam.dart';
 
 class TitleTouchPrompt extends StatelessWidget {
   const TitleTouchPrompt({
