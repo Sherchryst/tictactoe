@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../domain/entities/scoreboard.dart';
+import 'package:tictactoe/features/game/domain/entities/scoreboard.dart';
 
 part 'scoreboard_dto.g.dart';
 

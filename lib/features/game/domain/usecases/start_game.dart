@@ -1,10 +1,10 @@
-import '../entities/game_session.dart';
-import '../entities/game_settings.dart';
+import 'package:tictactoe/features/game/domain/entities/game_session.dart';
+import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 
 final class StartGame {
   const StartGame();
 
-  GameSession call(GameSettings settings) {
-    return GameSession.newGame(settings);
+  GameSession call(GameSetup setup) {
+    return GameSession.newGame(setup);
   }
 }

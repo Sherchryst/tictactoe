@@ -1,19 +1,24 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:tictactoe/features/game/domain/entities/cell.dart';
+import 'package:tictactoe/features/game/domain/entities/game_domain_messages.dart';
 
-import 'cell.dart';
-import 'game_domain_messages.dart';
+final class Board {
+  factory Board({required List<Cell> cells}) {
+    if (cells.length != cellCount) {
+      throw ArgumentError.value(
+        cells.length,
+        'cells.length',
+        GameDomainMessages.boardMustContainNineCells,
+      );
+    }
 
-part 'board.freezed.dart';
+    return Board._(List<Cell>.unmodifiable(cells));
+  }
 
-@freezed
-abstract class Board with _$Board {
-  const Board._();
-
-  const factory Board({required List<Cell> cells}) = _Board;
+  const Board._(this.cells);
 
   factory Board.empty() {
-    return const Board(
-      cells: [
+    return Board(
+      cells: const [
         Cell.empty,
         Cell.empty,
         Cell.empty,
@@ -30,6 +35,8 @@ abstract class Board with _$Board {
   static const size = 3;
   static const cellCount = size * size;
 
+  final List<Cell> cells;
+
   bool get isFull => !cells.contains(Cell.empty);
 
   List<int> get emptyCells {
@@ -40,11 +47,11 @@ abstract class Board with _$Board {
   }
 
   bool canPlace(int index) {
-    return index >= 0 && index < cellCount && cells[index].isEmpty;
+    return index >= 0 && index < cells.length && cells[index].isEmpty;
   }
 
   Cell cellAt(int index) {
-    RangeError.checkValidIndex(index, cells);
+    RangeError.checkValidIndex(index, cells, 'index', cellCount);
     return cells[index];
   }
 
@@ -55,6 +62,32 @@ abstract class Board with _$Board {
 
     final nextCells = List<Cell>.of(cells);
     nextCells[index] = cell;
-    return copyWith(cells: nextCells);
+    return Board(cells: nextCells);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is Board && _sameCells(other.cells, cells);
+  }
+
+  @override
+  int get hashCode => Object.hashAll(cells);
+
+  @override
+  String toString() => 'Board(cells: $cells)';
+
+  static bool _sameCells(List<Cell> first, List<Cell> second) {
+    if (first.length != second.length) {
+      return false;
+    }
+
+    for (var index = 0; index < first.length; index++) {
+      if (first[index] != second[index]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

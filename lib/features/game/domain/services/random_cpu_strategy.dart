@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import '../entities/board.dart';
-import '../entities/game_domain_messages.dart';
-import '../entities/player.dart';
-import 'cpu_strategy.dart';
+import 'package:tictactoe/features/game/domain/entities/board.dart';
+import 'package:tictactoe/features/game/domain/entities/game_domain_messages.dart';
+import 'package:tictactoe/features/game/domain/entities/player.dart';
+import 'package:tictactoe/features/game/domain/services/cpu_strategy.dart';
 
 final class RandomCpuStrategy implements CpuStrategy {
   RandomCpuStrategy({Random? random}) : _random = random ?? Random();

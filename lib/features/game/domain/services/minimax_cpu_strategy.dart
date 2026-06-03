@@ -1,9 +1,9 @@
-import '../entities/board.dart';
-import '../entities/game_domain_messages.dart';
-import '../entities/game_result.dart';
-import '../entities/player.dart';
-import 'cpu_strategy.dart';
-import 'game_rules.dart';
+import 'package:tictactoe/features/game/domain/entities/board.dart';
+import 'package:tictactoe/features/game/domain/entities/game_domain_messages.dart';
+import 'package:tictactoe/features/game/domain/entities/game_result.dart';
+import 'package:tictactoe/features/game/domain/entities/player.dart';
+import 'package:tictactoe/features/game/domain/services/cpu_strategy.dart';
+import 'package:tictactoe/features/game/domain/services/game_rules.dart';
 
 final class MinimaxCpuStrategy implements CpuStrategy {
   const MinimaxCpuStrategy({GameRules rules = const GameRules()})

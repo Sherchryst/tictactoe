@@ -1,0 +1,1 @@
+enum MusicTrack { menu, game }

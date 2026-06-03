@@ -1,28 +1,28 @@
 import 'dart:convert';
 
-import '../../../../core/storage/key_value_storage.dart';
-import '../models/game_settings_dto.dart';
-import '../models/scoreboard_dto.dart';
-import 'game_storage_keys.dart';
+import 'package:tictactoe/core/storage/key_value_storage.dart';
+import 'package:tictactoe/features/game/data/datasources/game_storage_keys.dart';
+import 'package:tictactoe/features/game/data/models/app_preferences_dto.dart';
+import 'package:tictactoe/features/game/data/models/scoreboard_dto.dart';
 
 final class LocalGamePreferencesDataSource {
   const LocalGamePreferencesDataSource(this._storage);
 
   final KeyValueStorage _storage;
 
-  Future<GameSettingsDto?> loadSettings() async {
-    final json = await _storage.readString(GameStorageKeys.settings);
+  Future<AppPreferencesDto?> loadPreferences() async {
+    final json = await _storage.readString(GameStorageKeys.preferences);
     if (json == null) {
       return null;
     }
 
-    return GameSettingsDto.fromJson(jsonDecode(json) as Map<String, dynamic>);
+    return _decodeObject(json, AppPreferencesDto.fromJson);
   }
 
-  Future<void> saveSettings(GameSettingsDto settings) {
+  Future<void> savePreferences(AppPreferencesDto preferences) {
     return _storage.writeString(
-      GameStorageKeys.settings,
-      jsonEncode(settings.toJson()),
+      GameStorageKeys.preferences,
+      jsonEncode(preferences.toJson()),
     );
   }
 
@@ -32,7 +32,7 @@ final class LocalGamePreferencesDataSource {
       return null;
     }
 
-    return ScoreboardDto.fromJson(jsonDecode(json) as Map<String, dynamic>);
+    return _decodeObject(json, ScoreboardDto.fromJson);
   }
 
   Future<void> saveScoreboard(ScoreboardDto scoreboard) {
@@ -44,5 +44,18 @@ final class LocalGamePreferencesDataSource {
 
   Future<void> resetScoreboard() {
     return _storage.remove(GameStorageKeys.scoreboard);
+  }
+
+  T? _decodeObject<T>(String raw, T Function(Map<String, dynamic>) fromJson) {
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic>) {
+        return null;
+      }
+
+      return fromJson(decoded);
+    } catch (_) {
+      return null;
+    }
   }
 }

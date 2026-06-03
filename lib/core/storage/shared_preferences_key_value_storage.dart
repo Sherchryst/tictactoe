@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'key_value_storage.dart';
+import 'package:tictactoe/core/storage/key_value_storage.dart';
 
 final class SharedPreferencesKeyValueStorage implements KeyValueStorage {
   const SharedPreferencesKeyValueStorage(this._preferences);

@@ -1,8 +1,8 @@
-import '../entities/board.dart';
-import '../entities/cell.dart';
-import '../entities/game_domain_messages.dart';
-import '../entities/game_result.dart';
-import '../entities/player.dart';
+import 'package:tictactoe/features/game/domain/entities/board.dart';
+import 'package:tictactoe/features/game/domain/entities/cell.dart';
+import 'package:tictactoe/features/game/domain/entities/game_domain_messages.dart';
+import 'package:tictactoe/features/game/domain/entities/game_result.dart';
+import 'package:tictactoe/features/game/domain/entities/player.dart';
 
 final class GameRules {
   const GameRules();

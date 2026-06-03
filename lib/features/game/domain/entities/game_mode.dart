@@ -1,1 +1,0 @@
-enum GameMode { humanVsCpu, humanVsHuman }

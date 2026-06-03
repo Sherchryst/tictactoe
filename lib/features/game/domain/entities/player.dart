@@ -1,4 +1,4 @@
-import 'cell.dart';
+import 'package:tictactoe/features/game/domain/entities/cell.dart';
 
 enum Player {
   human,

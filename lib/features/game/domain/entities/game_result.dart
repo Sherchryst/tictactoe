@@ -1,9 +1,10 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'game_outcome.dart';
-import 'player.dart';
+import 'package:tictactoe/features/game/domain/entities/player.dart';
 
 part 'game_result.freezed.dart';
+
+enum GameOutcome { humanWin, cpuWin, draw }
 
 @freezed
 sealed class GameResult with _$GameResult {

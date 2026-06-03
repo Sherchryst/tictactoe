@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'game_outcome.dart';
+import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 
 part 'scoreboard.freezed.dart';
 

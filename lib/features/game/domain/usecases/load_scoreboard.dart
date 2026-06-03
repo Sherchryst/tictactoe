@@ -1,12 +1,10 @@
-import '../entities/scoreboard.dart';
-import '../repositories/scoreboard_repository.dart';
+import 'package:tictactoe/features/game/domain/entities/scoreboard.dart';
+import 'package:tictactoe/features/game/domain/repositories/scoreboard_repository.dart';
 
 final class LoadScoreboard {
   const LoadScoreboard(this._repository);
 
   final ScoreboardRepository _repository;
 
-  Future<Scoreboard> call() {
-    return _repository.load();
-  }
+  Future<Scoreboard> call() => _repository.load();
 }
