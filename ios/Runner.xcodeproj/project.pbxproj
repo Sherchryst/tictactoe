@@ -201,6 +201,7 @@
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				BA94F7BF787E2330E0B94859 /* [CP] Embed Pods Frameworks */,
+				8D4D1F8A24D4412E9D449901 /* Code Sign Native Asset Frameworks */,
 			);
 			buildRules = (
 			);
@@ -324,6 +325,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
+		};
+		8D4D1F8A24D4412E9D449901 /* Code Sign Native Asset Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Code Sign Native Asset Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"${CODE_SIGNING_ALLOWED:-YES}\" = \"NO\" ]; then\n  echo \"Skipping native asset framework signing because code signing is disabled.\"\n  exit 0\nfi\n\nSIGN_IDENTITY=\"${EXPANDED_CODE_SIGN_IDENTITY:-${CODE_SIGN_IDENTITY:-}}\"\nif [ -z \"$SIGN_IDENTITY\" ] || [ \"$SIGN_IDENTITY\" = \"-\" ]; then\n  echo \"Skipping native asset framework signing because no signing identity is available.\"\n  exit 0\nfi\n\nFRAMEWORKS_DIR=\"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\nfor framework in \"$FRAMEWORKS_DIR\"/objective_c.framework; do\n  [ -d \"$framework\" ] || continue\n  echo \"Signing native asset framework with $SIGN_IDENTITY: $framework\"\n  /usr/bin/codesign --force --sign \"$SIGN_IDENTITY\" --timestamp=none --generate-entitlement-der \"$framework\"\ndone\n";
 		};
 		BA94F7BF787E2330E0B94859 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;

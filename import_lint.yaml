@@ -1,0 +1,36 @@
+import_lint:
+  common:
+    severity: warning
+  rules:
+    domain_isolation:
+      target_file_path: 'lib/features/*/domain/**.dart'
+      not_allowed_imports:
+        - 'lib/features/*/data/**'
+        - 'lib/features/*/presentation/**'
+        - 'lib/design_system/**'
+        - 'package:flutter/**'
+        - 'package:flutter_riverpod/**'
+        - 'package:hooks_riverpod/**'
+        - 'package:go_router/**'
+        - 'package:shared_preferences/**'
+      excluded_imports: []
+    design_system_isolation:
+      target_file_path: 'lib/design_system/**.dart'
+      not_allowed_imports:
+        - 'lib/features/**'
+        - 'lib/app/**'
+        - 'lib/core/storage/**'
+      excluded_imports: []
+    data_isolation:
+      target_file_path: 'lib/features/*/data/**.dart'
+      not_allowed_imports:
+        - 'lib/features/*/presentation/**'
+        - 'package:flutter/widgets.dart'
+        - 'package:flutter/material.dart'
+        - 'package:go_router/**'
+      excluded_imports: []
+    presentation_isolation:
+      target_file_path: 'lib/features/*/presentation/**.dart'
+      not_allowed_imports:
+        - 'lib/features/*/data/**'
+      excluded_imports: []

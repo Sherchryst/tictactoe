@@ -10,11 +10,19 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_riverpod: ^3.3.1
+  flutter_localizations:
+    sdk: flutter
+  flutter_hooks: ^0.21.3+1
+  audio_session: ^0.2.2
+  hooks_riverpod: ^3.3.1
+  intl: any
   freezed_annotation: ^3.1.0
   go_router: ^17.2.3
-  json_annotation: ^4.12.0
+  just_audio: ^0.10.5
+  json_annotation: ^4.11.0
+  riverpod_annotation: ^4.0.2
   shared_preferences: ^2.5.5
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -23,7 +31,33 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   freezed: ^3.2.5
   import_lint: ^0.1.6
-  json_serializable: ^6.14.0
+  json_serializable: ^6.13.0
+  mockito: ^5.6.4
+  riverpod_generator: ^4.0.3
 
 flutter:
+  generate: true
   uses-material-design: true
+  assets:
+    - assets/elden_ring/official/elden_ring_press_wordmark_gold_1920.png
+    - assets/elden_ring/logo/elden_ring_sigil_gold_512.png
+    - assets/elden_ring/items/player_x__flask_crimson_tears_512.png
+    - assets/elden_ring/items/player_o__rune_arc_512.png
+    - assets/elden_ring/items/flask_crimson_tears_4_512.png
+    - assets/elden_ring/items/rune_arc_512.png
+    - assets/elden_ring/items/golden_rune_1_512.png
+    - assets/elden_ring/audio/music/home_title__elden_ring_track_01_licensed.mp3
+    - assets/elden_ring/audio/music/malenia_blade_of_miquella_01.mp3
+    - assets/elden_ring/audio/sfx/title_start_01.mp3
+    - assets/elden_ring/audio/sfx/selection_02.mp3
+    - assets/elden_ring/audio/sfx/parry_01.mp3
+    - assets/elden_ring/audio/sfx/victory_01.mp3
+    - assets/elden_ring/audio/sfx/death_intro_01.mp3
+    - assets/elden_ring/audio/sfx/death_01.mp3
+    - assets/elden_ring/audio/sfx/critical_hit_cut_01.mp3
+    - assets/elden_ring/audio/sfx/restart_grace_01.mp3
+    - assets/elden_ring/vfx/title_menu_selection_glow.svg
+  fonts:
+    - family: Mantinia
+      fonts:
+        - asset: assets/elden_ring/fonts/mantinia_regular.otf

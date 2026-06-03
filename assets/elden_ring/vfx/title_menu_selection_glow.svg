@@ -1,0 +1,19 @@
+<svg width="960" height="120" viewBox="0 0 960 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="haze" cx="50%" cy="50%" r="56%">
+      <stop offset="0%" stop-color="#E3C16B" stop-opacity="0.75"/>
+      <stop offset="36%" stop-color="#C19D53" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="960" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F4D98A" stop-opacity="0"/>
+      <stop offset="13%" stop-color="#C19D53" stop-opacity="0.22"/>
+      <stop offset="50%" stop-color="#F4D98A" stop-opacity="0.72"/>
+      <stop offset="87%" stop-color="#C19D53" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#F4D98A" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="480" cy="60" rx="480" ry="36" fill="url(#haze)"/>
+  <rect x="0" y="57" width="960" height="4" fill="url(#line)" opacity="0.7"/>
+  <rect x="0" y="52" width="960" height="14" fill="url(#line)" opacity="0.22"/>
+</svg>
