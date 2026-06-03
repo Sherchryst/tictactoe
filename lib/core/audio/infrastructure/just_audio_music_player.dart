@@ -30,6 +30,7 @@ final class JustAudioMusicPlayer implements MusicPlayer {
     String asset, {
     required double targetVolume,
     Duration transitionDuration = const Duration(milliseconds: 420),
+    Duration startAt = Duration.zero,
   }) async {
     if (_disposed || _loadingAsset == asset) {
       return;
@@ -73,6 +74,13 @@ final class JustAudioMusicPlayer implements MusicPlayer {
 
       await _player.setLoopMode(just_audio.LoopMode.one);
       await _player.setAsset(asset);
+      if (!_isActiveTransition(transitionId)) {
+        return;
+      }
+
+      if (startAt > Duration.zero) {
+        await _player.seek(startAt);
+      }
       if (!_isActiveTransition(transitionId)) {
         return;
       }

@@ -53,6 +53,7 @@ void main() {
             any,
             targetVolume: anyNamed('targetVolume'),
             transitionDuration: anyNamed('transitionDuration'),
+            startAt: anyNamed('startAt'),
           ),
         );
 
@@ -65,6 +66,7 @@ void main() {
             any,
             targetVolume: anyNamed('targetVolume'),
             transitionDuration: anyNamed('transitionDuration'),
+            startAt: anyNamed('startAt'),
           ),
         );
         verify(
@@ -92,6 +94,7 @@ void main() {
             any,
             targetVolume: anyNamed('targetVolume'),
             transitionDuration: anyNamed('transitionDuration'),
+            startAt: anyNamed('startAt'),
           ),
         );
 
@@ -104,9 +107,35 @@ void main() {
             AppAssets.gameMusic,
             targetVolume: AudioPreferences.defaultMusicVolume,
             transitionDuration: anyNamed('transitionDuration'),
+            startAt: Duration.zero,
           ),
         ).called(1);
       },
     );
+
+    test('starts menu music after the opening 12 seconds', () async {
+      final repository = MockAudioPreferencesRepository();
+      final musicPlayer = MockMusicPlayer();
+      stubAudioPreferencesRepository(repository);
+      final container = createContainer(
+        repository: repository,
+        musicPlayer: musicPlayer,
+      );
+      final controller = container.read(appAudioControllerProvider.notifier);
+      await container.pump();
+      await Future<void>.delayed(Duration.zero);
+      clearInteractions(musicPlayer);
+
+      await controller.playTrack(MusicTrack.menu);
+
+      verify(
+        musicPlayer.play(
+          AppAssets.musicLoop,
+          targetVolume: AudioPreferences.defaultMusicVolume,
+          transitionDuration: anyNamed('transitionDuration'),
+          startAt: const Duration(seconds: 12),
+        ),
+      ).called(1);
+    });
   });
 }

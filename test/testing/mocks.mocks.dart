@@ -288,6 +288,7 @@ class MockMusicPlayer extends _i1.Mock implements _i16.MusicPlayer {
     String? asset, {
     required double? targetVolume,
     Duration? transitionDuration,
+    Duration? startAt,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
@@ -296,6 +297,7 @@ class MockMusicPlayer extends _i1.Mock implements _i16.MusicPlayer {
               {
                 #targetVolume: targetVolume,
                 #transitionDuration: transitionDuration,
+                #startAt: startAt,
               },
             ),
             returnValue: _i5.Future<void>.value(),

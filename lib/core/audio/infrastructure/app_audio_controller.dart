@@ -19,6 +19,7 @@ final class AppAudioController extends _$AppAudioController
     implements AudioController, AudioPreferencesController {
   static const _menuTransition = Duration(milliseconds: 420);
   static const _gameTransition = Duration(seconds: 5);
+  static const _menuStartOffset = Duration(seconds: 12);
 
   static const _trackAssets = <MusicTrack, String>{
     MusicTrack.menu: AppAssets.musicLoop,
@@ -28,6 +29,11 @@ final class AppAudioController extends _$AppAudioController
   static const _trackTransitions = <MusicTrack, Duration>{
     MusicTrack.menu: _menuTransition,
     MusicTrack.game: _gameTransition,
+  };
+
+  static const _trackStartOffsets = <MusicTrack, Duration>{
+    MusicTrack.menu: _menuStartOffset,
+    MusicTrack.game: Duration.zero,
   };
 
   static const _menuSfxAssets = <MenuSfx, _SfxBinding>{
@@ -89,6 +95,7 @@ final class AppAudioController extends _$AppAudioController
       _trackAssets[track]!,
       targetVolume: state.musicVolume,
       transitionDuration: _trackTransitions[track]!,
+      startAt: _trackStartOffsets[track]!,
     );
   }
 

@@ -3,6 +3,7 @@ abstract interface class MusicPlayer {
     String asset, {
     required double targetVolume,
     Duration transitionDuration,
+    Duration startAt,
   });
 
   Future<void> prepare(String asset);

@@ -39,6 +39,7 @@ void stubMusicPlayer(MockMusicPlayer musicPlayer) {
       any,
       targetVolume: anyNamed('targetVolume'),
       transitionDuration: anyNamed('transitionDuration'),
+      startAt: anyNamed('startAt'),
     ),
   ).thenAnswer((_) async {});
   when(musicPlayer.prepare(any)).thenAnswer((_) async {});
