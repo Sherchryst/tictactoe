@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../../game/domain/entities/game_settings.dart';
-import '../../../game/domain/entities/scoreboard.dart';
+import 'package:tictactoe/features/game/domain/entities/app_preferences.dart';
+import 'package:tictactoe/features/game/domain/entities/scoreboard.dart';
 
 part 'settings_view_state.freezed.dart';
 
@@ -10,13 +10,13 @@ abstract class SettingsViewState with _$SettingsViewState {
   const SettingsViewState._();
 
   const factory SettingsViewState({
-    required GameSettings settings,
+    required AppPreferences preferences,
     required Scoreboard scoreboard,
   }) = _SettingsViewState;
 
   factory SettingsViewState.initial() {
     return SettingsViewState(
-      settings: GameSettings.defaults(),
+      preferences: AppPreferences.defaults(),
       scoreboard: Scoreboard.empty(),
     );
   }

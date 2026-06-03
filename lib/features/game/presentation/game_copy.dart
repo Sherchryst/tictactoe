@@ -1,152 +1,112 @@
-import '../domain/entities/cell.dart';
-import '../domain/entities/game_difficulty.dart';
-import '../domain/entities/game_mode.dart';
-import '../domain/entities/game_result.dart';
-import '../domain/entities/player.dart';
+import 'package:flutter/widgets.dart';
+
+import 'package:tictactoe/features/game/domain/entities/app_preferences.dart';
+import 'package:tictactoe/features/game/domain/entities/game_result.dart';
+import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
+import 'package:tictactoe/features/game/domain/entities/player.dart';
+import 'package:tictactoe/features/game/presentation/copy/game_status_resolver.dart';
+import 'package:tictactoe/features/game/presentation/copy/player_label_resolver.dart';
+import 'package:tictactoe/features/game/presentation/copy/system_help_resolver.dart';
+import 'package:tictactoe/l10n/app_localizations.dart';
 
 final class GameCopy {
-  const GameCopy._();
+  GameCopy._(this._l10n)
+    : _playerLabels = PlayerLabelResolver(_l10n),
+      _statuses = GameStatusResolver(_l10n),
+      _systemHelp = SystemHelpResolver(_l10n);
 
   static const appTitle = 'Tic Tac Toe';
-  static const homeTitle = appTitle;
-  static const gameTitle = 'Game';
-  static const settingsTitle = 'Preferences';
-  static const gameSettingsTitle = settingsTitle;
 
-  static const settingsTooltip = settingsTitle;
-  static const homeTooltip = 'Home';
-  static const backTooltip = 'Back';
+  final AppLocalizations _l10n;
+  final PlayerLabelResolver _playerLabels;
+  final GameStatusResolver _statuses;
+  final SystemHelpResolver _systemHelp;
 
-  static const humanVsCpuLabel = 'vs AI';
-  static const humanVsHumanLabel = '1 vs 1';
-  static const localGameAction = '1 vs 1';
-  static const aiGameAction = 'vs AI';
-  static const playAction = 'Start game';
-  static const newRoundAction = 'Play again';
-  static const resetScoreAction = 'Reset score';
-  static const selectDifficultyTitle = 'Solo';
-  static const selectDifficultyMessage = 'Select difficulty';
-  static const gameOverTitle = 'Game over';
-  static const playAgainAction = 'Play again';
-  static const goHomeAction = 'Go home';
-  static const vsLabel = 'vs';
+  static GameCopy of(BuildContext context) {
+    return GameCopy._(AppLocalizations.of(context));
+  }
 
-  static const modeTitle = 'Mode';
-  static const difficultyTitle = 'Difficulty';
-  static const themeTitle = 'Theme';
-  static const scoreTitle = 'Score';
+  String get touchScreenPrompt => _l10n.touchScreenPrompt;
+  String get gameTitle => _l10n.gameTitle;
+  String get loadingTitle => _l10n.loadingTitle;
+  String get loadingFooter => _l10n.loadingFooter;
+  String get settingsTitle => _l10n.settingsTitle;
+  String get systemHeaderTitle => _l10n.systemHeaderTitle;
+  String get homeTooltip => _l10n.homeTooltip;
+  String get backTooltip => _l10n.backTooltip;
+  String get localGameAction => _l10n.localGameAction;
+  String get aiGameAction => _l10n.aiGameAction;
+  String get resetScoreAction => _l10n.resetScoreAction;
+  String get selectDifficultyTitle => _l10n.selectDifficultyTitle;
+  String get selectDifficultyMessage => _l10n.selectDifficultyMessage;
+  String get gameOverTitle => _l10n.gameOverTitle;
+  String get playAgainAction => _l10n.playAgainAction;
+  String get goHomeAction => _l10n.goHomeAction;
+  String get vsLabel => _l10n.vsLabel;
+  String get audioTitle => _l10n.audioTitle;
+  String get languageTitle => _l10n.languageTitle;
+  String get musicTitle => _l10n.musicTitle;
+  String get sfxTitle => _l10n.sfxTitle;
+  String get musicVolumeLabel => _l10n.musicVolumeLabel;
+  String get sfxVolumeLabel => _l10n.sfxVolumeLabel;
+  String get scoreTitle => _l10n.scoreTitle;
+  String get easyLabel => _l10n.easyLabel;
+  String get hardLabel => _l10n.hardLabel;
+  String get humanScoreLabel => _l10n.humanScoreLabel;
+  String get cpuScoreLabel => _l10n.cpuScoreLabel;
+  String get drawsScoreLabel => _l10n.drawsScoreLabel;
+  String get duelsFoughtLabel => _l10n.duelsFoughtLabel;
+  String get resetScoreHint => _l10n.resetScoreHint;
+  String get drawStatus => _l10n.drawStatus;
+  String get drawDialogTitle => _l10n.drawDialogTitle;
+  String get settingsLoadError => _l10n.settingsLoadError;
+  String get onLabel => _l10n.onLabel;
+  String get offLabel => _l10n.offLabel;
+  String get soundOptionsTitle => _l10n.soundOptionsTitle;
+  String get recordTitle => _l10n.recordTitle;
+  String get languageOptionsTitle => _l10n.languageOptionsTitle;
 
-  static const easyLabel = 'Easy';
-  static const mediumLabel = 'Medium';
-  static const hardLabel = 'Hard';
-  static const systemThemeLabel = 'System';
-  static const lightThemeLabel = 'Light';
-  static const darkThemeLabel = 'Dark';
-
-  static const humanScoreLabel = 'You';
-  static const cpuScoreLabel = 'CPU';
-  static const playerXScoreLabel = 'Player X';
-  static const playerOScoreLabel = 'Player O';
-  static const drawsScoreLabel = 'Draws';
-
-  static const humanMark = 'X';
-  static const cpuMark = 'O';
-  static const emptyMark = '';
-
-  static const humanTurnStatus = 'Your turn';
-  static const cpuTurnStatus = 'CPU turn';
-  static const playerXTurnStatus = 'Player X turn';
-  static const playerOTurnStatus = 'Player O turn';
-  static const humanWinStatus = 'You win';
-  static const cpuWinStatus = 'CPU wins';
-  static const playerXWinStatus = 'Player X wins';
-  static const playerOWinStatus = 'Player O wins';
-  static const drawStatus = 'Draw';
-  static const drawDialogTitle = 'It is a draw';
-
-  static const scoreUnavailable = 'Score unavailable';
-  static const settingsLoadError = 'Unable to load settings.';
-  static const gameSettingsLoadError = 'Unable to load game settings.';
-
-  static String gameModeTitle(GameMode mode) {
+  String gameModeTitle(GameMode mode) {
     return switch (mode) {
-      GameMode.humanVsCpu => humanVsCpuLabel,
-      GameMode.humanVsHuman => humanVsHumanLabel,
+      GameMode.humanVsCpu => _l10n.humanVsCpuLabel,
+      GameMode.humanVsHuman => _l10n.humanVsHumanLabel,
     };
   }
 
-  static String winDialogTitle(Player winner, GameMode mode) {
-    return switch (mode) {
-      GameMode.humanVsCpu =>
-        winner == Player.human ? humanWinStatus : cpuWinStatus,
-      GameMode.humanVsHuman =>
-        winner == Player.human ? playerXWinStatus : playerOWinStatus,
+  String languageLabel(AppLocalePreference localePreference) {
+    return switch (localePreference) {
+      AppLocalePreference.english => _l10n.englishLanguageLabel,
+      AppLocalePreference.french => _l10n.frenchLanguageLabel,
+      AppLocalePreference.spanish => _l10n.spanishLanguageLabel,
+      AppLocalePreference.german => _l10n.germanLanguageLabel,
     };
   }
 
-  static String scoreLabelFor(Player player, GameMode mode) {
-    return switch (mode) {
-      GameMode.humanVsCpu =>
-        player == Player.human ? humanScoreLabel : cpuScoreLabel,
-      GameMode.humanVsHuman =>
-        player == Player.human ? playerXScoreLabel : playerOScoreLabel,
-    };
+  String winDialogTitle(Player winner, GameMode mode) {
+    return _playerLabels.win(winner, mode);
   }
 
-  static String statusFor(
+  String scoreLabelFor(Player player, GameMode mode) {
+    return _playerLabels.score(player, mode);
+  }
+
+  String statusFor(
     GameResult result,
     Player currentPlayer, {
     GameMode mode = GameMode.humanVsCpu,
   }) {
-    return switch (result) {
-      GameOngoing() => _turnStatusFor(currentPlayer, mode),
-      GameWin(:final winner) => _winStatusFor(winner, mode),
-      GameDraw() => drawStatus,
-    };
+    return _statuses.resolve(result, currentPlayer, mode);
   }
 
-  static String markFor(Cell cell) {
-    return switch (cell) {
-      Cell.human => humanMark,
-      Cell.cpu => cpuMark,
-      Cell.empty => emptyMark,
-    };
+  String helpTextForAudio(int focusedRowIndex) {
+    return _systemHelp.forAudio(focusedRowIndex);
   }
 
-  static String _turnStatusFor(Player player, GameMode mode) {
-    return switch (mode) {
-      GameMode.humanVsCpu =>
-        player == Player.human ? humanTurnStatus : cpuTurnStatus,
-      GameMode.humanVsHuman =>
-        player == Player.human ? playerXTurnStatus : playerOTurnStatus,
-    };
+  String helpTextForScore(int focusedRowIndex) {
+    return _systemHelp.forScore(focusedRowIndex);
   }
 
-  static String _winStatusFor(Player player, GameMode mode) {
-    return switch (mode) {
-      GameMode.humanVsCpu =>
-        player == Player.human ? humanWinStatus : cpuWinStatus,
-      GameMode.humanVsHuman =>
-        player == Player.human ? playerXWinStatus : playerOWinStatus,
-    };
-  }
-}
-
-extension GameModeCopy on GameMode {
-  String get label {
-    return switch (this) {
-      GameMode.humanVsCpu => GameCopy.humanVsCpuLabel,
-      GameMode.humanVsHuman => GameCopy.humanVsHumanLabel,
-    };
-  }
-}
-
-extension GameDifficultyCopy on GameDifficulty {
-  String get label {
-    return switch (this) {
-      GameDifficulty.easy => GameCopy.easyLabel,
-      GameDifficulty.medium => GameCopy.mediumLabel,
-      GameDifficulty.hard => GameCopy.hardLabel,
-    };
+  String helpTextForLanguage(int focusedRowIndex) {
+    return _systemHelp.forLanguage(focusedRowIndex);
   }
 }

@@ -1,25 +1,22 @@
 import 'dart:async';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/di/game_dependencies.dart';
-import '../../../settings/presentation/controllers/settings_controller.dart';
-import '../../domain/entities/game_outcome.dart';
-import '../../domain/entities/game_settings.dart';
-import 'game_view_state.dart';
+import 'package:tictactoe/app/di/game_dependencies.dart';
+import 'package:tictactoe/features/game/domain/entities/game_result.dart';
+import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
+import 'package:tictactoe/features/game/presentation/controllers/game_view_state.dart';
+import 'package:tictactoe/features/game/presentation/controllers/scoreboard_controller.dart';
 
-final gameControllerProvider = NotifierProvider<GameController, GameViewState>(
-  GameController.new,
-);
+part 'game_controller.g.dart';
 
-final class GameController extends Notifier<GameViewState> {
+@Riverpod(keepAlive: true)
+final class GameController extends _$GameController {
   @override
-  GameViewState build() {
-    return GameViewState.initial();
-  }
+  GameViewState build() => GameViewState.initial();
 
-  void startGame(GameSettings settings) {
-    state = GameViewState(session: ref.read(startGameProvider).call(settings));
+  void startGame(GameSetup setup) {
+    state = GameViewState(session: ref.read(startGameProvider).call(setup));
   }
 
   void startNewRound() {
@@ -51,11 +48,6 @@ final class GameController extends Notifier<GameViewState> {
   }
 
   Future<void> _recordOutcome(GameOutcome outcome) async {
-    final scoreboard = await ref.read(recordGameOutcomeProvider).call(outcome);
-    if (!ref.mounted) {
-      return;
-    }
-
-    ref.read(settingsControllerProvider.notifier).replaceScoreboard(scoreboard);
+    await ref.read(scoreboardControllerProvider.notifier).record(outcome);
   }
 }

@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../domain/entities/game_session.dart';
-import '../../domain/entities/game_settings.dart';
+import 'package:tictactoe/features/game/domain/entities/game_session.dart';
+import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 
 part 'game_view_state.freezed.dart';
 
@@ -15,6 +15,6 @@ abstract class GameViewState with _$GameViewState {
   }) = _GameViewState;
 
   factory GameViewState.initial() {
-    return GameViewState(session: GameSession.newGame(GameSettings.defaults()));
+    return GameViewState(session: GameSession.newGame(GameSetup.defaults()));
   }
 }

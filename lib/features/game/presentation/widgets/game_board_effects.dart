@@ -1,0 +1,226 @@
+part of 'game_board.dart';
+
+class _ImpactFlash extends StatelessWidget {
+  const _ImpactFlash();
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: IgnorePointer(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: AppDurations.boardMarkReveal,
+          curve: AppCurves.emphasized,
+          builder: (context, value, child) {
+            return Opacity(
+              opacity: (1 - value).clamp(0.0, 0.9),
+              child: Transform.scale(scale: 0.78 + value * 0.52, child: child),
+            );
+          },
+          child: SizedBox.square(
+            dimension: 118,
+            child: CustomPaint(
+              isComplex: true,
+              willChange: true,
+              painter: _ImpactFlashPainter(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SlashEffect extends StatelessWidget {
+  const _SlashEffect({required this.isGold, required this.angle});
+
+  final bool isGold;
+  final double angle;
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: IgnorePointer(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: AppDurations.medium,
+          curve: AppCurves.entrance,
+          builder: (context, value, child) {
+            final opacity = value < 0.42 ? value / 0.42 : (1 - value) / 0.58;
+
+            return Opacity(
+              opacity: opacity.clamp(0.0, 1.0),
+              child: Transform.rotate(
+                angle: angle,
+                child: Transform.scale(
+                  scale: 0.78 + value * 0.34,
+                  child: child,
+                ),
+              ),
+            );
+          },
+          child: SizedBox.square(
+            dimension: 142,
+            child: CustomPaint(
+              isComplex: true,
+              willChange: true,
+              painter: _SlashPainter(isGold: isGold),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ParticleRing extends StatelessWidget {
+  const _ParticleRing({required this.isGold});
+
+  final bool isGold;
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: IgnorePointer(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: AppDurations.boardParticleRing,
+          curve: AppCurves.entrance,
+          builder: (context, value, child) {
+            return Opacity(
+              opacity: (1 - value).clamp(0.0, 0.72),
+              child: SizedBox.square(
+                dimension: 116,
+                child: CustomPaint(
+                  isComplex: true,
+                  willChange: true,
+                  painter: _ParticleRingPainter(
+                    progress: value,
+                    isGold: isGold,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _WinningBeam extends StatelessWidget {
+  const _WinningBeam({required this.winningCells, required this.winner});
+
+  final List<int> winningCells;
+  final Player winner;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final size = constraints.biggest;
+
+            return TweenAnimationBuilder<double>(
+              key: ValueKey('${winner.name}:${winningCells.join('-')}'),
+              tween: Tween(begin: 0, end: 1),
+              duration: AppDurations.boardWinBeam,
+              builder: (context, value, child) {
+                return RepaintBoundary(
+                  child: CustomPaint(
+                    size: size,
+                    isComplex: true,
+                    willChange: true,
+                    painter: _WinningBeamPainter(
+                      winningCells: winningCells,
+                      winner: winner,
+                      progress: value,
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawFog extends StatelessWidget {
+  const _DrawFog();
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: RepaintBoundary(
+        child: IgnorePointer(
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: AppDurations.boardDrawFog,
+            curve: AppCurves.entrance,
+            builder: (context, value, child) {
+              return Opacity(
+                opacity: (1 - value).clamp(0.0, 0.46),
+                child: Transform.translate(
+                  offset: Offset(0, -18 * value),
+                  child: child,
+                ),
+              );
+            },
+            child: CustomPaint(
+              isComplex: true,
+              willChange: true,
+              painter: _DrawFogPainter(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawShake extends HookWidget {
+  const _DrawShake({required this.enabled, required this.child});
+
+  final bool enabled;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = useAnimationController(
+      duration: AppDurations.boardDrawShake,
+    );
+    final offset = useMemoized(() {
+      return TweenSequence<double>([
+        TweenSequenceItem(tween: ConstantTween(-2), weight: 1),
+        TweenSequenceItem(tween: ConstantTween(2), weight: 1),
+        TweenSequenceItem(tween: ConstantTween(-1), weight: 1),
+        TweenSequenceItem(tween: ConstantTween(1), weight: 1),
+        TweenSequenceItem(tween: ConstantTween(0), weight: 1),
+      ]).animate(controller);
+    }, [controller]);
+    final hasBuilt = useRef(false);
+
+    useEffect(() {
+      if (hasBuilt.value && enabled) {
+        unawaited(controller.forward(from: 0));
+      }
+      hasBuilt.value = true;
+
+      return null;
+    }, [enabled]);
+
+    return AnimatedBuilder(
+      animation: offset,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(offset.value, 0),
+          child: child,
+        );
+      },
+      child: child,
+    );
+  }
+}
