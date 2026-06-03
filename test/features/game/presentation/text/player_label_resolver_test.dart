@@ -23,6 +23,13 @@ void main() {
       );
     });
 
+    test('returns the long badge name for the human player', () {
+      expect(
+        resolver.badgeName(Player.human, GameMode.humanVsCpu),
+        l10n.humanTurnStatus,
+      );
+    });
+
     test('returns the win label for the winner in solo', () {
       expect(
         resolver.win(Player.human, GameMode.humanVsCpu),

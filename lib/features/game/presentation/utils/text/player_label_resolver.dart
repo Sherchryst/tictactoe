@@ -16,6 +16,15 @@ final class PlayerLabelResolver {
     };
   }
 
+  String badgeName(Player player, GameMode mode) {
+    return switch (mode) {
+      GameMode.humanVsCpu =>
+        player == Player.human ? _l10n.humanTurnStatus : _l10n.cpuTurnStatus,
+      GameMode.humanVsHuman =>
+        player == Player.human ? _l10n.humanTurnStatus : _l10n.cpuTurnStatus,
+    };
+  }
+
   String win(Player player, GameMode mode) {
     return switch (mode) {
       GameMode.humanVsCpu =>

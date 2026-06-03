@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -6,9 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tictactoe/core/audio/domain/services/audio_controller.dart';
 import 'package:tictactoe/core/design_system/tokens/app_breakpoints.dart';
 import 'package:tictactoe/core/design_system/tokens/app_spacing.dart';
-import 'package:tictactoe/core/design_system/tokens/app_typography.dart';
 import 'package:tictactoe/core/design_system/widgets/app_icon_button.dart';
-import 'package:tictactoe/core/design_system/widgets/rune_diamond.dart';
 import 'package:tictactoe/core/di/audio_providers.dart';
 import 'package:tictactoe/core/router/app_routes.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
@@ -18,11 +17,14 @@ import 'package:tictactoe/features/game/domain/services/game_audio_effects.dart'
 import 'package:tictactoe/features/game/presentation/controllers/game_controller.dart';
 import 'package:tictactoe/features/game/presentation/dialogs/game_over_dialog.dart';
 import 'package:tictactoe/features/game/presentation/widgets/draw_critical_impact.dart';
-import 'package:tictactoe/features/game/presentation/widgets/duel_ribbon.dart';
 import 'package:tictactoe/features/game/presentation/widgets/game_board.dart';
+import 'package:tictactoe/features/game/presentation/widgets/game_player_badge.dart';
 import 'package:tictactoe/features/game/presentation/widgets/game_scene_backdrop.dart';
 import 'package:tictactoe/features/game/presentation/widgets/solo_trial_banner.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
+
+const _boardScreenRatio = 0.9;
+const _boardAvailableRatio = 0.96;
 
 class GamePage extends ConsumerWidget {
   const GamePage({super.key});
@@ -61,6 +63,10 @@ class GamePage extends ConsumerWidget {
 
     final compact = AppBreakpoints.isCompact(context);
     final horizontal = compact ? AppSpacing.lg : AppSpacing.xl;
+    final activePlayer = _activePlayer(
+      game.session.result,
+      game.session.currentPlayer,
+    );
 
     return Scaffold(
       body: Stack(
@@ -78,38 +84,68 @@ class GamePage extends ConsumerWidget {
               child: Column(
                 children: [
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppIconButton(
                         icon: Icons.arrow_back_rounded,
                         onPressed: () => context.go(AppRoutes.homeLocation),
                         tooltip: l10n.homeTooltip,
                       ),
-                      const Spacer(),
-                      _ModeMark(label: _gameModeTitle(l10n, game.session.mode)),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: GamePlayerBadge(
+                            player: Player.cpu,
+                            mode: game.session.mode,
+                            active: activePlayer == Player.cpu,
+                            side: GamePlayerBadgeSide.right,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   Expanded(
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          maxWidth: AppBreakpoints.boardMaxWidth,
-                        ),
-                        child: GameBoard(
-                          board: game.session.board,
-                          result: game.session.result,
-                          onCellPressed: ref
-                              .read(gameControllerProvider.notifier)
-                              .playCell,
-                        ),
-                      ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final screenShortestSide = MediaQuery.sizeOf(
+                          context,
+                        ).shortestSide;
+                        final targetDimension =
+                            screenShortestSide * _boardScreenRatio;
+                        final availableDimension =
+                            math.min(
+                              constraints.maxWidth,
+                              constraints.maxHeight,
+                            ) *
+                            _boardAvailableRatio;
+                        final dimension = math.min(
+                          targetDimension,
+                          availableDimension,
+                        );
+
+                        return Center(
+                          child: SizedBox.square(
+                            dimension: dimension,
+                            child: GameBoard(
+                              board: game.session.board,
+                              result: game.session.result,
+                              onCellPressed: ref
+                                  .read(gameControllerProvider.notifier)
+                                  .playCell,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                  SizedBox(height: compact ? AppSpacing.lg : AppSpacing.xl),
-                  DuelRibbon(
-                    mode: game.session.mode,
-                    activePlayer: _activePlayer(
-                      game.session.result,
-                      game.session.currentPlayer,
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: GamePlayerBadge(
+                      player: Player.human,
+                      mode: game.session.mode,
+                      active: activePlayer == Player.human,
+                      side: GamePlayerBadgeSide.left,
                     ),
                   ),
                 ],
@@ -132,13 +168,6 @@ class GamePage extends ConsumerWidget {
       GameOngoing() => currentPlayer,
       GameWin(:final winner) => winner,
       GameDraw() => null,
-    };
-  }
-
-  String _gameModeTitle(AppLocalizations l10n, GameMode mode) {
-    return switch (mode) {
-      GameMode.humanVsCpu => l10n.humanVsCpuLabel,
-      GameMode.humanVsHuman => l10n.humanVsHumanLabel,
     };
   }
 
@@ -181,23 +210,5 @@ class GamePage extends ConsumerWidget {
     } else if (choice == GameOverChoice.home && context.mounted) {
       context.go(AppRoutes.homeLocation);
     }
-  }
-}
-
-class _ModeMark extends StatelessWidget {
-  const _ModeMark({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const RuneDiamond(size: 4),
-        const SizedBox(width: AppSpacing.sm),
-        Text(label, style: AppTypography.of(context).chromeMark(active: true)),
-      ],
-    );
   }
 }

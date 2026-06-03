@@ -12,99 +12,57 @@ import 'package:tictactoe/features/game/domain/entities/player.dart';
 import 'package:tictactoe/features/game/presentation/utils/text/player_label_resolver.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
 
-enum _Side { left, right }
+enum GamePlayerBadgeSide { left, right }
 
 const _compactMedallionSize = 30.0;
 const _regularMedallionSize = 34.0;
 
-class DuelRibbon extends StatelessWidget {
-  const DuelRibbon({required this.activePlayer, required this.mode, super.key});
-
-  final Player? activePlayer;
-  final GameMode mode;
-
-  @override
-  Widget build(BuildContext context) {
-    final compact = AppBreakpoints.isCompact(context);
-    final playerLabels = PlayerLabelResolver(AppLocalizations.of(context));
-
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: compact ? AppSpacing.sm : AppSpacing.md,
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final availableWidth = constraints.maxWidth.isFinite
-              ? constraints.maxWidth
-              : MediaQuery.sizeOf(context).width;
-          final minimumCenterGap = compact ? AppSpacing.xxl : AppSpacing.xxxl;
-          final maximumEntryWidth = ((availableWidth - minimumCenterGap) / 2)
-              .clamp(0.0, compact ? 172.0 : 226.0)
-              .toDouble();
-          final entryWidth = (availableWidth * (compact ? 0.36 : 0.34))
-              .clamp(0.0, maximumEntryWidth)
-              .toDouble();
-
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: entryWidth,
-                child: _RosterEntry(
-                  side: _Side.left,
-                  emblem: AppAssets.flask,
-                  name: playerLabels.score(Player.human, mode),
-                  active: activePlayer == Player.human,
-                ),
-              ),
-              SizedBox(
-                width: entryWidth,
-                child: _RosterEntry(
-                  side: _Side.right,
-                  emblem: AppAssets.runeArc,
-                  name: playerLabels.score(Player.cpu, mode),
-                  active: activePlayer == Player.cpu,
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _RosterEntry extends StatelessWidget {
-  const _RosterEntry({
-    required this.side,
-    required this.emblem,
-    required this.name,
+class GamePlayerBadge extends StatelessWidget {
+  const GamePlayerBadge({
+    required this.player,
+    required this.mode,
     required this.active,
+    required this.side,
+    super.key,
   });
 
-  final _Side side;
-  final String emblem;
-  final String name;
+  final Player player;
+  final GameMode mode;
   final bool active;
+  final GamePlayerBadgeSide side;
 
   @override
   Widget build(BuildContext context) {
     final compact = AppBreakpoints.isCompact(context);
-    final medallion = _Medallion(emblem: emblem, active: active);
+    final labels = PlayerLabelResolver(AppLocalizations.of(context));
+    final medallion = _Medallion(emblem: _emblemFor(player), active: active);
     final label = Expanded(
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: compact ? AppSpacing.sm : AppSpacing.md,
         ),
-        child: _NameLabel(name: name, active: active, side: side),
+        child: _NameLabel(
+          name: labels.badgeName(player, mode),
+          active: active,
+          side: side,
+        ),
       ),
     );
-
-    final children = side == _Side.left
+    final children = side == GamePlayerBadgeSide.left
         ? [medallion, label]
         : [label, medallion];
 
-    return Row(children: children);
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: compact ? 330 : 360),
+      child: Row(children: children),
+    );
+  }
+
+  String _emblemFor(Player player) {
+    return switch (player) {
+      Player.human => AppAssets.flask,
+      Player.cpu => AppAssets.runeArc,
+    };
   }
 }
 
@@ -170,27 +128,40 @@ class _NameLabel extends StatelessWidget {
 
   final String name;
   final bool active;
-  final _Side side;
+  final GamePlayerBadgeSide side;
 
   @override
   Widget build(BuildContext context) {
     final style = AppTypography.of(context).chromeMark(active: active);
-    final align = side == _Side.left ? TextAlign.left : TextAlign.right;
-
-    return active
+    final textAlign = side == GamePlayerBadgeSide.left
+        ? TextAlign.left
+        : TextAlign.right;
+    final boxAlignment = side == GamePlayerBadgeSide.left
+        ? Alignment.centerLeft
+        : Alignment.centerRight;
+    final text = active
         ? GildedText(
             name,
-            textAlign: align,
+            textAlign: textAlign,
             maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+            overflow: TextOverflow.visible,
             style: style,
           )
         : Text(
             name,
-            textAlign: align,
+            textAlign: textAlign,
             maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+            overflow: TextOverflow.visible,
             style: style,
           );
+
+    return Align(
+      alignment: boxAlignment,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: boxAlignment,
+        child: text,
+      ),
+    );
   }
 }

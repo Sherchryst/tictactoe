@@ -70,4 +70,29 @@ void main() {
     expect(game.hasRecordedOutcome, isTrue);
     expect(scoreboard.humanWins, 1);
   });
+
+  test('does not record local duel outcomes in the scoreboard', () async {
+    final storage = InMemoryKeyValueStorage();
+    final container = createContainer(storage: storage);
+
+    container
+        .read(gameControllerProvider.notifier)
+        .startGame(const GameSetup(mode: GameMode.humanVsHuman));
+    container.read(gameControllerProvider.notifier).playCell(0);
+    container.read(gameControllerProvider.notifier).playCell(3);
+    container.read(gameControllerProvider.notifier).playCell(1);
+    container.read(gameControllerProvider.notifier).playCell(4);
+    container.read(gameControllerProvider.notifier).playCell(2);
+    await Future<void>.delayed(Duration.zero);
+    await container.pump();
+
+    final game = container.read(gameControllerProvider);
+    final scoreboard = await container.read(
+      scoreboardControllerProvider.future,
+    );
+
+    expect(game.session.result.outcome, isNotNull);
+    expect(game.hasRecordedOutcome, isFalse);
+    expect(scoreboard.playedGames, 0);
+  });
 }

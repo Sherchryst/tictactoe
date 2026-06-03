@@ -36,12 +36,14 @@ final class GameController extends _$GameController {
     }
 
     final outcome = session.result.outcome;
+    final shouldRecordOutcome =
+        outcome != null && previous.session.mode == GameMode.humanVsCpu;
     state = previous.copyWith(
       session: session,
-      hasRecordedOutcome: outcome != null || previous.hasRecordedOutcome,
+      hasRecordedOutcome: shouldRecordOutcome || previous.hasRecordedOutcome,
     );
 
-    if (outcome != null && !previous.hasRecordedOutcome) {
+    if (shouldRecordOutcome && !previous.hasRecordedOutcome) {
       unawaited(_recordOutcome(outcome));
     }
   }

@@ -149,11 +149,17 @@ void main() {
     await tester.tap(find.text(en.localGameAction));
     await finishGameLoading(tester);
 
-    expect(find.text(en.humanVsHumanLabel), findsOneWidget);
-    expect(find.text(en.humanScoreLabel), findsOneWidget);
-    expect(find.text(en.cpuScoreLabel), findsOneWidget);
+    expect(find.text(en.humanVsHumanLabel), findsNothing);
+    expect(find.text(en.humanTurnStatus), findsOneWidget);
+    expect(find.text(en.cpuTurnStatus), findsOneWidget);
 
     final boardRect = tester.getRect(find.byType(GameBoard));
+    final humanLabelRect = tester.getRect(find.text(en.humanTurnStatus));
+    final cpuLabelRect = tester.getRect(find.text(en.cpuTurnStatus));
+
+    expect(cpuLabelRect.bottom, lessThanOrEqualTo(boardRect.top));
+    expect(humanLabelRect.top, greaterThanOrEqualTo(boardRect.bottom));
+
     await tester.tapAt(
       boardRect.topLeft + Offset(boardRect.width / 6, boardRect.height / 6),
     );
@@ -224,8 +230,8 @@ void main() {
     await tester.tap(find.text(en.hardLabel));
     await finishGameLoading(tester);
 
-    expect(find.text(en.humanVsCpuLabel), findsOneWidget);
-    expect(find.text(en.humanScoreLabel), findsOneWidget);
-    expect(find.text(en.cpuScoreLabel), findsOneWidget);
+    expect(find.text(en.humanVsCpuLabel), findsNothing);
+    expect(find.text(en.humanTurnStatus), findsOneWidget);
+    expect(find.text(en.cpuTurnStatus), findsOneWidget);
   });
 }
