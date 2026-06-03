@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import 'package:tictactoe/design_system/theme/app_palette.dart';
-import 'package:tictactoe/design_system/tokens/app_alphas.dart';
-import 'package:tictactoe/design_system/tokens/app_durations.dart';
-import 'package:tictactoe/design_system/tokens/app_gradients.dart';
-import 'package:tictactoe/design_system/widgets/ambient_motes.dart';
-import 'package:tictactoe/design_system/widgets/fog_veil.dart';
-import 'package:tictactoe/design_system/widgets/grace_glow.dart';
+import 'package:tictactoe/core/design_system/theme/app_palette.dart';
+import 'package:tictactoe/core/design_system/tokens/app_alphas.dart';
+import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
+import 'package:tictactoe/core/design_system/tokens/app_gradients.dart';
+import 'package:tictactoe/core/design_system/widgets/ambient_motes.dart';
+import 'package:tictactoe/core/design_system/widgets/fog_veil.dart';
+import 'package:tictactoe/core/design_system/widgets/grace_glow.dart';
 
 class GameSceneBackdrop extends HookWidget {
   const GameSceneBackdrop({super.key});

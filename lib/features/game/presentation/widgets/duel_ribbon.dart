@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-
-import 'package:tictactoe/core/assets/app_assets.dart';
-import 'package:tictactoe/design_system/theme/app_palette.dart';
-import 'package:tictactoe/design_system/tokens/app_alphas.dart';
-import 'package:tictactoe/design_system/tokens/app_breakpoints.dart';
-import 'package:tictactoe/design_system/tokens/app_durations.dart';
-import 'package:tictactoe/design_system/tokens/app_spacing.dart';
-import 'package:tictactoe/design_system/tokens/app_typography.dart';
-import 'package:tictactoe/design_system/widgets/gilded_text.dart';
+import 'package:tictactoe/core/design_system/theme/app_palette.dart';
+import 'package:tictactoe/core/design_system/tokens/app_alphas.dart';
+import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
+import 'package:tictactoe/core/design_system/tokens/app_breakpoints.dart';
+import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
+import 'package:tictactoe/core/design_system/tokens/app_spacing.dart';
+import 'package:tictactoe/core/design_system/tokens/app_typography.dart';
+import 'package:tictactoe/core/design_system/widgets/gilded_text.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/domain/entities/player.dart';
-import 'package:tictactoe/features/game/presentation/game_copy.dart';
+import 'package:tictactoe/features/game/presentation/utils/text/player_label_resolver.dart';
+import 'package:tictactoe/l10n/app_localizations.dart';
 
 enum _Side { left, right }
 
@@ -26,7 +26,7 @@ class DuelRibbon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final compact = AppBreakpoints.isCompact(context);
-    final copy = GameCopy.of(context);
+    final playerLabels = PlayerLabelResolver(AppLocalizations.of(context));
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -53,7 +53,7 @@ class DuelRibbon extends StatelessWidget {
                 child: _RosterEntry(
                   side: _Side.left,
                   emblem: AppAssets.flask,
-                  name: copy.scoreLabelFor(Player.human, mode),
+                  name: playerLabels.score(Player.human, mode),
                   active: activePlayer == Player.human,
                 ),
               ),
@@ -62,7 +62,7 @@ class DuelRibbon extends StatelessWidget {
                 child: _RosterEntry(
                   side: _Side.right,
                   emblem: AppAssets.runeArc,
-                  name: copy.scoreLabelFor(Player.cpu, mode),
+                  name: playerLabels.score(Player.cpu, mode),
                   active: activePlayer == Player.cpu,
                 ),
               ),

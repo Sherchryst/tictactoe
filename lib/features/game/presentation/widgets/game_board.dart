@@ -1,29 +1,27 @@
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-
-import 'package:tictactoe/core/assets/app_assets.dart';
-import 'package:tictactoe/design_system/theme/app_palette.dart';
-import 'package:tictactoe/design_system/tokens/app_alphas.dart';
-import 'package:tictactoe/design_system/tokens/app_curves.dart';
-import 'package:tictactoe/design_system/tokens/app_durations.dart';
-import 'package:tictactoe/design_system/tokens/app_gradients.dart';
-import 'package:tictactoe/design_system/tokens/app_shadows.dart';
-import 'package:tictactoe/design_system/widgets/app_haptics.dart';
-import 'package:tictactoe/design_system/widgets/chrome_corner_flourish.dart';
-import 'package:tictactoe/design_system/widgets/sigil_backdrop.dart';
+import 'package:tictactoe/core/design_system/theme/app_palette.dart';
+import 'package:tictactoe/core/design_system/tokens/app_alphas.dart';
+import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
+import 'package:tictactoe/core/design_system/tokens/app_curves.dart';
+import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
+import 'package:tictactoe/core/design_system/tokens/app_gradients.dart';
+import 'package:tictactoe/core/design_system/tokens/app_shadows.dart';
+import 'package:tictactoe/core/design_system/widgets/app_haptics.dart';
+import 'package:tictactoe/core/design_system/widgets/chrome_corner_flourish.dart';
+import 'package:tictactoe/core/design_system/widgets/sigil_backdrop.dart';
 import 'package:tictactoe/features/game/domain/entities/board.dart';
 import 'package:tictactoe/features/game/domain/entities/cell.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/player.dart';
+import 'package:tictactoe/features/game/presentation/utils/rendering/game_board_painters.dart';
 
 part 'game_board_cell.dart';
 part 'game_board_effects.dart';
-part 'game_board_painters.dart';
 
 class GameBoard extends HookWidget {
   const GameBoard({
@@ -96,7 +94,7 @@ class GameBoard extends HookWidget {
                   RepaintBoundary(
                     child: CustomPaint(
                       isComplex: true,
-                      painter: _BoardGridPainter(),
+                      painter: BoardGridPainter(),
                     ),
                   ),
                   const Positioned.fill(

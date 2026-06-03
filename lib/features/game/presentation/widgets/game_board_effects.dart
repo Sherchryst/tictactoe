@@ -22,7 +22,7 @@ class _ImpactFlash extends StatelessWidget {
             child: CustomPaint(
               isComplex: true,
               willChange: true,
-              painter: _ImpactFlashPainter(),
+              painter: ImpactFlashPainter(),
             ),
           ),
         ),
@@ -64,7 +64,7 @@ class _SlashEffect extends StatelessWidget {
             child: CustomPaint(
               isComplex: true,
               willChange: true,
-              painter: _SlashPainter(isGold: isGold),
+              painter: SlashPainter(isGold: isGold),
             ),
           ),
         ),
@@ -94,10 +94,7 @@ class _ParticleRing extends StatelessWidget {
                 child: CustomPaint(
                   isComplex: true,
                   willChange: true,
-                  painter: _ParticleRingPainter(
-                    progress: value,
-                    isGold: isGold,
-                  ),
+                  painter: ParticleRingPainter(progress: value, isGold: isGold),
                 ),
               ),
             );
@@ -132,7 +129,7 @@ class _WinningBeam extends StatelessWidget {
                     size: size,
                     isComplex: true,
                     willChange: true,
-                    painter: _WinningBeamPainter(
+                    painter: WinningBeamPainter(
                       winningCells: winningCells,
                       winner: winner,
                       progress: value,
@@ -172,7 +169,7 @@ class _DrawFog extends StatelessWidget {
             child: CustomPaint(
               isComplex: true,
               willChange: true,
-              painter: _DrawFogPainter(),
+              painter: DrawFogPainter(),
             ),
           ),
         ),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import 'package:tictactoe/design_system/theme/app_palette.dart';
-import 'package:tictactoe/design_system/tokens/app_alphas.dart';
-import 'package:tictactoe/design_system/tokens/app_curves.dart';
-import 'package:tictactoe/design_system/tokens/app_durations.dart';
-import 'package:tictactoe/design_system/tokens/app_typography.dart';
-import 'package:tictactoe/design_system/widgets/app_haptics.dart';
+import 'package:tictactoe/core/design_system/theme/app_palette.dart';
+import 'package:tictactoe/core/design_system/tokens/app_alphas.dart';
+import 'package:tictactoe/core/design_system/tokens/app_curves.dart';
+import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
+import 'package:tictactoe/core/design_system/tokens/app_typography.dart';
+import 'package:tictactoe/core/design_system/widgets/app_haptics.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/domain/entities/player.dart';

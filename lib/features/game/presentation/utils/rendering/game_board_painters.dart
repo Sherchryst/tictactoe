@@ -1,6 +1,14 @@
-part of 'game_board.dart';
+import 'dart:math' as math;
+import 'dart:ui' as ui;
 
-class _BoardGridPainter extends CustomPainter {
+import 'package:flutter/material.dart';
+import 'package:tictactoe/core/design_system/theme/app_palette.dart';
+import 'package:tictactoe/core/design_system/tokens/app_alphas.dart';
+import 'package:tictactoe/core/design_system/tokens/app_curves.dart';
+import 'package:tictactoe/features/game/domain/entities/board.dart';
+import 'package:tictactoe/features/game/domain/entities/player.dart';
+
+class BoardGridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final inset = Paint()
@@ -77,10 +85,10 @@ class _BoardGridPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _BoardGridPainter oldDelegate) => false;
+  bool shouldRepaint(covariant BoardGridPainter oldDelegate) => false;
 }
 
-class _ImpactFlashPainter extends CustomPainter {
+class ImpactFlashPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
@@ -120,11 +128,11 @@ class _ImpactFlashPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ImpactFlashPainter oldDelegate) => false;
+  bool shouldRepaint(covariant ImpactFlashPainter oldDelegate) => false;
 }
 
-class _SlashPainter extends CustomPainter {
-  const _SlashPainter({required this.isGold});
+class SlashPainter extends CustomPainter {
+  const SlashPainter({required this.isGold});
 
   final bool isGold;
 
@@ -157,13 +165,13 @@ class _SlashPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _SlashPainter oldDelegate) {
+  bool shouldRepaint(covariant SlashPainter oldDelegate) {
     return oldDelegate.isGold != isGold;
   }
 }
 
-class _ParticleRingPainter extends CustomPainter {
-  const _ParticleRingPainter({required this.progress, required this.isGold});
+class ParticleRingPainter extends CustomPainter {
+  const ParticleRingPainter({required this.progress, required this.isGold});
 
   final double progress;
   final bool isGold;
@@ -188,13 +196,13 @@ class _ParticleRingPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ParticleRingPainter oldDelegate) {
+  bool shouldRepaint(covariant ParticleRingPainter oldDelegate) {
     return oldDelegate.progress != progress || oldDelegate.isGold != isGold;
   }
 }
 
-class _WinningBeamPainter extends CustomPainter {
-  const _WinningBeamPainter({
+class WinningBeamPainter extends CustomPainter {
+  const WinningBeamPainter({
     required this.winningCells,
     required this.winner,
     required this.progress,
@@ -402,7 +410,7 @@ class _WinningBeamPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _WinningBeamPainter oldDelegate) {
+  bool shouldRepaint(covariant WinningBeamPainter oldDelegate) {
     return oldDelegate.progress != progress ||
         oldDelegate.winner != winner ||
         !_sameCells(oldDelegate.winningCells, winningCells);
@@ -529,7 +537,7 @@ class _BeamPalette {
   final Color core;
 }
 
-class _DrawFogPainter extends CustomPainter {
+class DrawFogPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -558,5 +566,5 @@ class _DrawFogPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _DrawFogPainter oldDelegate) => false;
+  bool shouldRepaint(covariant DrawFogPainter oldDelegate) => false;
 }
