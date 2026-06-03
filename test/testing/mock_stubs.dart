@@ -1,9 +1,9 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:mockito/mockito.dart';
-import 'package:tictactoe/features/game/domain/entities/game_audio_settings.dart';
+import 'package:tictactoe/core/audio/domain/entities/audio_preferences.dart';
 
-import 'package:tictactoe/testing/mocks.mocks.dart';
+import 'mocks.mocks.dart';
 
 void stubAudioController(MockAudioController audio) {
   when(
@@ -22,14 +22,14 @@ void stubAudioController(MockAudioController audio) {
   when(audio.playMenuSfx(any)).thenAnswer((_) async {});
 }
 
-void stubAudioSettingsRepository(
-  MockAudioSettingsRepository repository, {
-  Future<GameAudioSettings>? load,
+void stubAudioPreferencesRepository(
+  MockAudioPreferencesRepository repository, {
+  Future<AudioPreferences>? load,
 }) {
-  provideDummy<GameAudioSettings>(const GameAudioSettings());
+  provideDummy<AudioPreferences>(const AudioPreferences());
   when(
     repository.load(),
-  ).thenAnswer((_) => load ?? Future.value(const GameAudioSettings()));
+  ).thenAnswer((_) => load ?? Future.value(const AudioPreferences()));
   when(repository.save(any)).thenAnswer((_) async {});
 }
 

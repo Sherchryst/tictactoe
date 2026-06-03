@@ -3,18 +3,19 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mockito/mockito.dart';
-import 'package:tictactoe/core/assets/app_assets.dart';
-import 'package:tictactoe/features/game/data/services/game_audio_controller.dart';
-import 'package:tictactoe/features/game/domain/entities/game_audio_settings.dart';
-import 'package:tictactoe/features/game/domain/entities/music_track.dart';
+import 'package:tictactoe/core/audio/domain/entities/audio_preferences.dart';
+import 'package:tictactoe/core/audio/domain/entities/music_track.dart';
+import 'package:tictactoe/core/audio/infrastructure/app_audio_controller.dart';
+import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
+import 'package:tictactoe/core/di/audio_dependencies.dart';
 
-import 'package:tictactoe/testing/mock_stubs.dart';
-import 'package:tictactoe/testing/mocks.mocks.dart';
-import 'package:tictactoe/testing/provider_container_factory.dart';
+import '../../../testing/mock_stubs.dart';
+import '../../../testing/mocks.mocks.dart';
+import '../../../testing/provider_container_factory.dart';
 
 void main() {
   ProviderContainer createContainer({
-    required MockAudioSettingsRepository repository,
+    required MockAudioPreferencesRepository repository,
     required MockMusicPlayer musicPlayer,
     MockSfxPlayer? sfxPlayer,
   }) {
@@ -25,26 +26,26 @@ void main() {
     return createTestContainer(
       registerTearDown: addTearDown,
       overrides: [
-        localAudioSettingsRepositoryProvider.overrideWithValue(repository),
+        localAudioPreferencesRepositoryProvider.overrideWithValue(repository),
         musicPlayerProvider.overrideWithValue(musicPlayer),
         sfxPlayerProvider.overrideWithValue(resolvedSfxPlayer),
       ],
     );
   }
 
-  group('GameAudioController', () {
+  group('AppAudioController', () {
     test(
       'does not play a pending track when loaded settings disable music',
       () async {
-        final settingsLoad = Completer<GameAudioSettings>();
-        final repository = MockAudioSettingsRepository();
+        final settingsLoad = Completer<AudioPreferences>();
+        final repository = MockAudioPreferencesRepository();
         final musicPlayer = MockMusicPlayer();
-        stubAudioSettingsRepository(repository, load: settingsLoad.future);
+        stubAudioPreferencesRepository(repository, load: settingsLoad.future);
         final container = createContainer(
           repository: repository,
           musicPlayer: musicPlayer,
         );
-        final controller = container.read(gameAudioControllerProvider.notifier);
+        final controller = container.read(appAudioControllerProvider.notifier);
 
         await controller.playTrack(MusicTrack.menu);
         verifyNever(
@@ -55,7 +56,7 @@ void main() {
           ),
         );
 
-        settingsLoad.complete(const GameAudioSettings(musicEnabled: false));
+        settingsLoad.complete(const AudioPreferences(musicEnabled: false));
         await container.pump();
         await Future<void>.delayed(Duration.zero);
 
@@ -75,15 +76,15 @@ void main() {
     test(
       'plays the pending track after settings load when music is enabled',
       () async {
-        final settingsLoad = Completer<GameAudioSettings>();
-        final repository = MockAudioSettingsRepository();
+        final settingsLoad = Completer<AudioPreferences>();
+        final repository = MockAudioPreferencesRepository();
         final musicPlayer = MockMusicPlayer();
-        stubAudioSettingsRepository(repository, load: settingsLoad.future);
+        stubAudioPreferencesRepository(repository, load: settingsLoad.future);
         final container = createContainer(
           repository: repository,
           musicPlayer: musicPlayer,
         );
-        final controller = container.read(gameAudioControllerProvider.notifier);
+        final controller = container.read(appAudioControllerProvider.notifier);
 
         await controller.playTrack(MusicTrack.game);
         verifyNever(
@@ -94,14 +95,14 @@ void main() {
           ),
         );
 
-        settingsLoad.complete(const GameAudioSettings());
+        settingsLoad.complete(const AudioPreferences());
         await container.pump();
         await Future<void>.delayed(Duration.zero);
 
         verify(
           musicPlayer.play(
             AppAssets.gameMusic,
-            targetVolume: GameAudioSettings.defaultMusicVolume,
+            targetVolume: AudioPreferences.defaultMusicVolume,
             transitionDuration: anyNamed('transitionDuration'),
           ),
         ).called(1);

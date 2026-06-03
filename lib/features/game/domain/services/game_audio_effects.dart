@@ -1,11 +1,11 @@
 import 'dart:async';
 
+import 'package:tictactoe/core/audio/domain/services/audio_controller.dart';
 import 'package:tictactoe/features/game/domain/entities/board.dart';
 import 'package:tictactoe/features/game/domain/entities/cell.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/domain/entities/player.dart';
-import 'package:tictactoe/features/game/domain/services/audio_controller.dart';
 
 final class GameAudioEffects {
   const GameAudioEffects(this._audio);

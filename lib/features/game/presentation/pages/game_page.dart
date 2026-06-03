@@ -3,27 +3,26 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import 'package:tictactoe/app/di/audio_providers.dart';
-import 'package:tictactoe/app/router/app_routes.dart';
-import 'package:tictactoe/design_system/tokens/app_breakpoints.dart';
-import 'package:tictactoe/design_system/tokens/app_spacing.dart';
-import 'package:tictactoe/design_system/tokens/app_typography.dart';
-import 'package:tictactoe/design_system/widgets/app_icon_button.dart';
-import 'package:tictactoe/design_system/widgets/rune_diamond.dart';
+import 'package:tictactoe/core/audio/domain/services/audio_controller.dart';
+import 'package:tictactoe/core/design_system/tokens/app_breakpoints.dart';
+import 'package:tictactoe/core/design_system/tokens/app_spacing.dart';
+import 'package:tictactoe/core/design_system/tokens/app_typography.dart';
+import 'package:tictactoe/core/design_system/widgets/app_icon_button.dart';
+import 'package:tictactoe/core/design_system/widgets/rune_diamond.dart';
+import 'package:tictactoe/core/di/audio_providers.dart';
+import 'package:tictactoe/core/router/app_routes.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/domain/entities/player.dart';
-import 'package:tictactoe/features/game/domain/services/audio_controller.dart';
 import 'package:tictactoe/features/game/domain/services/game_audio_effects.dart';
 import 'package:tictactoe/features/game/presentation/controllers/game_controller.dart';
 import 'package:tictactoe/features/game/presentation/dialogs/game_over_dialog.dart';
-import 'package:tictactoe/features/game/presentation/game_copy.dart';
 import 'package:tictactoe/features/game/presentation/widgets/draw_critical_impact.dart';
 import 'package:tictactoe/features/game/presentation/widgets/duel_ribbon.dart';
 import 'package:tictactoe/features/game/presentation/widgets/game_board.dart';
 import 'package:tictactoe/features/game/presentation/widgets/game_scene_backdrop.dart';
 import 'package:tictactoe/features/game/presentation/widgets/solo_trial_banner.dart';
+import 'package:tictactoe/l10n/app_localizations.dart';
 
 class GamePage extends ConsumerWidget {
   const GamePage({super.key});
@@ -33,7 +32,7 @@ class GamePage extends ConsumerWidget {
     final game = ref.watch(gameControllerProvider);
     final audio = ref.read(audioControllerProvider);
     final audioEffects = GameAudioEffects(audio);
-    final copy = GameCopy.of(context);
+    final l10n = AppLocalizations.of(context);
 
     ref.listen(gameControllerProvider, (previous, next) {
       unawaited(
@@ -83,10 +82,10 @@ class GamePage extends ConsumerWidget {
                       AppIconButton(
                         icon: Icons.arrow_back_rounded,
                         onPressed: () => context.go(AppRoutes.homeLocation),
-                        tooltip: copy.homeTooltip,
+                        tooltip: l10n.homeTooltip,
                       ),
                       const Spacer(),
-                      _ModeMark(label: copy.gameModeTitle(game.session.mode)),
+                      _ModeMark(label: _gameModeTitle(l10n, game.session.mode)),
                     ],
                   ),
                   Expanded(
@@ -133,6 +132,13 @@ class GamePage extends ConsumerWidget {
       GameOngoing() => currentPlayer,
       GameWin(:final winner) => winner,
       GameDraw() => null,
+    };
+  }
+
+  String _gameModeTitle(AppLocalizations l10n, GameMode mode) {
+    return switch (mode) {
+      GameMode.humanVsCpu => l10n.humanVsCpuLabel,
+      GameMode.humanVsHuman => l10n.humanVsHumanLabel,
     };
   }
 

@@ -7,8 +7,8 @@ import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/domain/entities/player.dart';
 import 'package:tictactoe/features/game/domain/services/game_audio_effects.dart';
 
-import 'package:tictactoe/testing/mock_stubs.dart';
-import 'package:tictactoe/testing/mocks.mocks.dart';
+import '../../../../testing/mock_stubs.dart';
+import '../../../../testing/mocks.mocks.dart';
 
 void main() {
   group('GameAudioEffects', () {

@@ -1,17 +1,22 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 
-import 'package:tictactoe/core/assets/app_assets.dart';
-import 'package:tictactoe/design_system/theme/app_palette.dart';
-import 'package:tictactoe/design_system/tokens/app_alphas.dart';
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:tictactoe/core/audio/domain/entities/menu_sfx.dart';
+import 'package:tictactoe/core/design_system/theme/app_palette.dart';
+import 'package:tictactoe/core/design_system/tokens/app_alphas.dart';
+import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
+import 'package:tictactoe/core/design_system/widgets/action_dialog.dart';
+import 'package:tictactoe/core/di/audio_providers.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/domain/entities/player.dart';
-import 'package:tictactoe/features/game/presentation/dialogs/action_dialog.dart';
-import 'package:tictactoe/features/game/presentation/game_copy.dart';
+import 'package:tictactoe/features/game/presentation/utils/text/player_label_resolver.dart';
+import 'package:tictactoe/l10n/app_localizations.dart';
 
 enum GameOverChoice { playAgain, home }
 
-class GameOverDialog extends StatelessWidget {
+class GameOverDialog extends ConsumerWidget {
   const GameOverDialog({required this.result, required this.mode, super.key});
 
   final GameResult result;
@@ -22,36 +27,42 @@ class GameOverDialog extends StatelessWidget {
     required GameResult result,
     required GameMode mode,
   }) {
-    final copy = GameCopy.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return showActionDialog<GameOverChoice>(
       context: context,
-      barrierLabel: copy.gameOverTitle,
+      barrierLabel: l10n.gameOverTitle,
       barrierDismissible: false,
       builder: (context) => GameOverDialog(result: result, mode: mode),
     );
   }
 
   @override
-  Widget build(BuildContext context) {
-    final copy = GameCopy.of(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final playerLabels = PlayerLabelResolver(l10n);
     final message = switch (result) {
-      GameWin(:final winner) => copy.winDialogTitle(winner, mode),
-      GameDraw() => copy.drawDialogTitle,
-      GameOngoing() => copy.gameTitle,
+      GameWin(:final winner) => playerLabels.win(winner, mode),
+      GameDraw() => l10n.drawDialogTitle,
+      GameOngoing() => l10n.gameTitle,
     };
 
     return ActionDialog(
-      title: copy.gameOverTitle,
+      title: l10n.gameOverTitle,
       message: message,
       leadingArt: _ResultGlyph(result: result, mode: mode),
+      onActionFeedback: () {
+        unawaited(
+          ref.read(audioControllerProvider).playMenuSfx(MenuSfx.select),
+        );
+      },
       actions: [
         ActionDialogButton(
-          label: copy.goHomeAction,
+          label: l10n.goHomeAction,
           onPressed: () => Navigator.of(context).pop(GameOverChoice.home),
         ),
         ActionDialogButton(
-          label: copy.playAgainAction,
+          label: l10n.playAgainAction,
           prominent: true,
           onPressed: () => Navigator.of(context).pop(GameOverChoice.playAgain),
         ),

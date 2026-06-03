@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tictactoe/features/game/data/services/audio_asset_cache.dart';
+import 'package:tictactoe/core/audio/infrastructure/audio_asset_cache.dart';
 
 class _RecordingBundle extends CachingAssetBundle {
   _RecordingBundle({required this.bytes});

@@ -1,18 +1,18 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tictactoe/core/storage/in_memory_key_value_storage.dart';
-import 'package:tictactoe/features/game/data/datasources/game_storage_keys.dart';
-import 'package:tictactoe/features/game/data/repositories/local_audio_settings_repository.dart';
-import 'package:tictactoe/features/game/domain/entities/game_audio_settings.dart';
+import 'package:tictactoe/core/audio/data/repositories/local_audio_preferences_repository.dart';
+import 'package:tictactoe/core/audio/domain/entities/audio_preferences.dart';
+
+import '../../../../testing/in_memory_key_value_storage.dart';
 
 void main() {
   late InMemoryKeyValueStorage storage;
-  late LocalAudioSettingsRepository repository;
+  late LocalAudioPreferencesRepository repository;
 
   setUp(() {
     storage = InMemoryKeyValueStorage();
-    repository = LocalAudioSettingsRepository(storage);
+    repository = LocalAudioPreferencesRepository(storage);
   });
 
   test('returns defaults when no preferences are saved', () async {
@@ -20,12 +20,12 @@ void main() {
 
     expect(loaded.musicEnabled, isTrue);
     expect(loaded.sfxEnabled, isTrue);
-    expect(loaded.musicVolume, GameAudioSettings.defaultMusicVolume);
-    expect(loaded.sfxVolume, GameAudioSettings.defaultSfxVolume);
+    expect(loaded.musicVolume, AudioPreferences.defaultMusicVolume);
+    expect(loaded.sfxVolume, AudioPreferences.defaultSfxVolume);
   });
 
   test('saves and loads settings', () async {
-    const settings = GameAudioSettings(
+    const settings = AudioPreferences(
       musicEnabled: false,
       sfxEnabled: false,
       musicVolume: 0.2,
@@ -42,9 +42,9 @@ void main() {
   });
 
   test('serializes concurrent saves', () async {
-    const first = GameAudioSettings(musicVolume: 0.1);
-    const second = GameAudioSettings(musicVolume: 0.4);
-    const third = GameAudioSettings(musicVolume: 0.9);
+    const first = AudioPreferences(musicVolume: 0.1);
+    const second = AudioPreferences(musicVolume: 0.4);
+    const third = AudioPreferences(musicVolume: 0.9);
 
     await Future.wait([
       repository.save(first),
@@ -56,9 +56,9 @@ void main() {
   });
 
   test('migrates legacy preferences when present', () async {
-    const legacy = GameAudioSettings(musicVolume: 0.7);
+    const legacy = AudioPreferences(musicVolume: 0.7);
     await storage.writeString(
-      GameStorageKeys.legacyAudioPreferences,
+      'eldenAudioPreferences',
       jsonEncode(legacy.toJson()),
     );
 
