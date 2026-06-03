@@ -1,78 +1,47 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tictactoe/core/di/game_dependencies.dart';
-import 'package:tictactoe/features/game/domain/entities/app_theme_preference.dart';
-import 'package:tictactoe/features/game/domain/entities/game_difficulty.dart';
-import 'package:tictactoe/features/game/domain/entities/game_mode.dart';
-import 'package:tictactoe/features/game/domain/entities/game_settings.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:tictactoe/app/di/game_dependencies.dart';
+import 'package:tictactoe/core/storage/in_memory_key_value_storage.dart';
+import 'package:tictactoe/features/game/domain/entities/app_preferences.dart';
 import 'package:tictactoe/features/game/domain/entities/scoreboard.dart';
-import 'package:tictactoe/features/settings/presentation/controllers/settings_controller.dart';
+import 'package:tictactoe/features/game/presentation/settings/controllers/settings_controller.dart';
 
-import '../../../../helpers/fake_key_value_storage.dart';
+import 'package:tictactoe/testing/provider_container_factory.dart';
 
 void main() {
-  ProviderContainer createContainer(FakeKeyValueStorage storage) {
-    final container = ProviderContainer(
+  ProviderContainer createContainer(InMemoryKeyValueStorage storage) {
+    return createTestContainer(
+      registerTearDown: addTearDown,
       overrides: [keyValueStorageProvider.overrideWithValue(storage)],
     );
-    addTearDown(container.dispose);
-    return container;
   }
 
-  test('loads default settings and scoreboard', () async {
-    final container = createContainer(FakeKeyValueStorage());
+  test('loads default preferences and scoreboard', () async {
+    final container = createContainer(InMemoryKeyValueStorage());
 
     final state = await container.read(settingsControllerProvider.future);
 
-    expect(state.settings, GameSettings.defaults());
+    expect(state.preferences, AppPreferences.defaults());
     expect(state.scoreboard, Scoreboard.empty());
   });
 
-  test('updates and persists difficulty', () async {
-    final storage = FakeKeyValueStorage();
+  test('updates and persists locale preference', () async {
+    final storage = InMemoryKeyValueStorage();
     final container = createContainer(storage);
     await container.read(settingsControllerProvider.future);
 
     await container
         .read(settingsControllerProvider.notifier)
-        .setDifficulty(GameDifficulty.hard);
+        .setLocalePreference(AppLocalePreference.german);
 
     final reloadedContainer = createContainer(storage);
     final reloadedState = await reloadedContainer.read(
       settingsControllerProvider.future,
     );
 
-    expect(reloadedState.settings.difficulty, GameDifficulty.hard);
-  });
-
-  test('updates and persists mode', () async {
-    final storage = FakeKeyValueStorage();
-    final container = createContainer(storage);
-    await container.read(settingsControllerProvider.future);
-
-    await container
-        .read(settingsControllerProvider.notifier)
-        .setMode(GameMode.humanVsHuman);
-
-    final reloadedContainer = createContainer(storage);
-    final reloadedState = await reloadedContainer.read(
-      settingsControllerProvider.future,
+    expect(
+      reloadedState.preferences.localePreference,
+      AppLocalePreference.german,
     );
-
-    expect(reloadedState.settings.mode, GameMode.humanVsHuman);
-  });
-
-  test('updates and persists theme preference', () async {
-    final storage = FakeKeyValueStorage();
-    final container = createContainer(storage);
-    await container.read(settingsControllerProvider.future);
-
-    await container
-        .read(settingsControllerProvider.notifier)
-        .setThemePreference(AppThemePreference.dark);
-
-    final state = container.read(settingsControllerProvider).requireValue;
-
-    expect(state.settings.themePreference, AppThemePreference.dark);
   });
 }
