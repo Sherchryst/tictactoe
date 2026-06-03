@@ -14,8 +14,11 @@ import 'package:tictactoe/l10n/app_localizations.dart';
 
 enum GamePlayerBadgeSide { left, right }
 
+enum _BadgeTone { active, idle, hostile }
+
 const _compactMedallionSize = 30.0;
 const _regularMedallionSize = 34.0;
+const _soloOpponentLabel = 'Malenia, Blade of Miquella';
 
 class GamePlayerBadge extends StatelessWidget {
   const GamePlayerBadge({
@@ -35,15 +38,16 @@ class GamePlayerBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final compact = AppBreakpoints.isCompact(context);
     final labels = PlayerLabelResolver(AppLocalizations.of(context));
-    final medallion = _Medallion(emblem: _emblemFor(player), active: active);
+    final tone = _toneFor(player, mode, active);
+    final medallion = _Medallion(emblem: _emblemFor(player, mode), tone: tone);
     final label = Expanded(
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: compact ? AppSpacing.sm : AppSpacing.md,
         ),
         child: _NameLabel(
-          name: labels.badgeName(player, mode),
-          active: active,
+          name: _labelFor(labels, player, mode),
+          tone: tone,
           side: side,
         ),
       ),
@@ -58,24 +62,45 @@ class GamePlayerBadge extends StatelessWidget {
     );
   }
 
-  String _emblemFor(Player player) {
+  String _labelFor(PlayerLabelResolver labels, Player player, GameMode mode) {
+    if (mode == GameMode.humanVsCpu && player == Player.cpu) {
+      return _soloOpponentLabel;
+    }
+    return labels.badgeName(player, mode);
+  }
+
+  String _emblemFor(Player player, GameMode mode) {
+    if (mode == GameMode.humanVsCpu && player == Player.cpu) {
+      return AppAssets.malenia;
+    }
+
     return switch (player) {
       Player.human => AppAssets.flask,
       Player.cpu => AppAssets.runeArc,
     };
   }
+
+  _BadgeTone _toneFor(Player player, GameMode mode, bool active) {
+    if (mode == GameMode.humanVsCpu && player == Player.cpu) {
+      return _BadgeTone.hostile;
+    }
+
+    return active ? _BadgeTone.active : _BadgeTone.idle;
+  }
 }
 
 class _Medallion extends StatelessWidget {
-  const _Medallion({required this.emblem, required this.active});
+  const _Medallion({required this.emblem, required this.tone});
 
   final String emblem;
-  final bool active;
+  final _BadgeTone tone;
 
   @override
   Widget build(BuildContext context) {
     final compact = AppBreakpoints.isCompact(context);
     final dimension = compact ? _compactMedallionSize : _regularMedallionSize;
+    final prominent = tone != _BadgeTone.idle;
+    final hostile = tone == _BadgeTone.hostile;
 
     return AnimatedContainer(
       duration: AppDurations.short,
@@ -86,23 +111,26 @@ class _Medallion extends StatelessWidget {
         shape: BoxShape.circle,
         gradient: RadialGradient(
           colors: [
-            AppPalette.surfaceRaised.withValues(
-              alpha: active ? AppAlphas.medium : AppAlphas.subtle,
-            ),
+            (hostile ? AppPalette.emberRed : AppPalette.surfaceRaised)
+                .withValues(
+                  alpha: prominent ? AppAlphas.medium : AppAlphas.subtle,
+                ),
             const Color(0x00000000),
           ],
         ),
         border: Border.all(
-          color: AppPalette.gold.withValues(
-            alpha: active ? AppAlphas.prominent : AppAlphas.muted,
+          color: (hostile ? AppPalette.lossRed : AppPalette.gold).withValues(
+            alpha: prominent ? AppAlphas.prominent : AppAlphas.muted,
           ),
-          width: active ? 1.4 : 1,
+          width: prominent ? 1.4 : 1,
         ),
-        boxShadow: active
+        boxShadow: prominent
             ? [
                 BoxShadow(
-                  color: AppPalette.gold.withValues(alpha: AppAlphas.medium),
-                  blurRadius: 14,
+                  color: (hostile ? AppPalette.lossRed : AppPalette.gold)
+                      .withValues(alpha: AppAlphas.medium),
+                  blurRadius: hostile ? 18 : 14,
+                  spreadRadius: hostile ? 1 : 0,
                 ),
               ]
             : null,
@@ -112,7 +140,7 @@ class _Medallion extends StatelessWidget {
         child: Image.asset(
           emblem,
           fit: BoxFit.contain,
-          opacity: AlwaysStoppedAnimation(active ? 1 : 0.6),
+          opacity: AlwaysStoppedAnimation(prominent ? 1 : 0.6),
         ),
       ),
     );
@@ -122,24 +150,45 @@ class _Medallion extends StatelessWidget {
 class _NameLabel extends StatelessWidget {
   const _NameLabel({
     required this.name,
-    required this.active,
+    required this.tone,
     required this.side,
   });
 
   final String name;
-  final bool active;
+  final _BadgeTone tone;
   final GamePlayerBadgeSide side;
 
   @override
   Widget build(BuildContext context) {
-    final style = AppTypography.of(context).chromeMark(active: active);
+    final hostile = tone == _BadgeTone.hostile;
+    final active = tone == _BadgeTone.active;
+    final style = AppTypography.of(
+      context,
+    ).chromeMark(active: tone != _BadgeTone.idle);
     final textAlign = side == GamePlayerBadgeSide.left
         ? TextAlign.left
         : TextAlign.right;
     final boxAlignment = side == GamePlayerBadgeSide.left
         ? Alignment.centerLeft
         : Alignment.centerRight;
-    final text = active
+    final hostileStyle = style?.copyWith(
+      color: AppPalette.lossRed.withValues(alpha: AppAlphas.opaque),
+      shadows: [
+        Shadow(
+          color: AppPalette.lossRed.withValues(alpha: AppAlphas.medium),
+          blurRadius: 12,
+        ),
+      ],
+    );
+    final text = hostile
+        ? Text(
+            name,
+            textAlign: textAlign,
+            maxLines: 1,
+            overflow: TextOverflow.visible,
+            style: hostileStyle,
+          )
+        : active
         ? GildedText(
             name,
             textAlign: textAlign,

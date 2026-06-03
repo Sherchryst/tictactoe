@@ -72,10 +72,7 @@ class _GameCell extends HookWidget {
                     child: const SizedBox.expand(),
                   ),
                 RepaintBoundary(
-                  child: _Mark(
-                    cell: cell,
-                    mode: mode,
-                  ),
+                  child: _Mark(cell: cell, mode: mode),
                 ),
               ],
             ),
@@ -117,9 +114,8 @@ class _Mark extends StatelessWidget {
   Widget build(BuildContext context) {
     final asset = switch (cell) {
       Cell.human => AppAssets.markX,
-      Cell.cpu => mode == GameMode.humanVsCpu
-          ? AppAssets.malenia
-          : AppAssets.markO,
+      Cell.cpu =>
+        mode == GameMode.humanVsCpu ? AppAssets.malenia : AppAssets.markO,
       Cell.empty => null,
     };
 

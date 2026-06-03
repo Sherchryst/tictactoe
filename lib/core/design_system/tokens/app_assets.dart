@@ -10,6 +10,7 @@ final class AppAssets {
   static const flask = 'assets/elden_ring/items/flask_crimson_tears_4_512.png';
   static const runeArc = 'assets/elden_ring/items/rune_arc_512.png';
   static const statusRune = 'assets/elden_ring/items/golden_rune_1_512.png';
+  static const malenia = 'assets/elden_ring/bosses/malenia.webp';
 
   static const musicLoop =
       'assets/elden_ring/audio/music/home_title__elden_ring_track_01_licensed.mp3';

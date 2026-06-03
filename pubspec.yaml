@@ -46,6 +46,7 @@ flutter:
     - assets/elden_ring/items/flask_crimson_tears_4_512.png
     - assets/elden_ring/items/rune_arc_512.png
     - assets/elden_ring/items/golden_rune_1_512.png
+    - assets/elden_ring/bosses/
     - assets/elden_ring/audio/music/home_title__elden_ring_track_01_licensed.mp3
     - assets/elden_ring/audio/music/malenia_blade_of_miquella_01.mp3
     - assets/elden_ring/audio/sfx/title_start_01.mp3

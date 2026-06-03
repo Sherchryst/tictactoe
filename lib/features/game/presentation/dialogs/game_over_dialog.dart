@@ -115,8 +115,10 @@ class _ResultGlyph extends StatelessWidget {
 
   String _assetFor(GameResult result) {
     return switch (result) {
-      GameWin(:final winner) =>
-        winner == Player.human ? AppAssets.flask : AppAssets.runeArc,
+      GameWin(:final winner) => switch (mode) {
+        GameMode.humanVsCpu when winner == Player.cpu => AppAssets.malenia,
+        _ => winner == Player.human ? AppAssets.flask : AppAssets.runeArc,
+      },
       GameDraw() => AppAssets.statusRune,
       GameOngoing() => AppAssets.statusRune,
     };
