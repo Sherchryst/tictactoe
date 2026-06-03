@@ -4,7 +4,7 @@ import 'package:tictactoe/features/game/domain/services/cpu_strategy_resolver.da
 import 'package:tictactoe/features/game/domain/services/minimax_cpu_strategy.dart';
 import 'package:tictactoe/features/game/domain/services/random_cpu_strategy.dart';
 
-import 'package:tictactoe/testing/mocks.mocks.dart';
+import '../../../../testing/mocks.mocks.dart';
 
 void main() {
   group('CpuStrategyResolver', () {

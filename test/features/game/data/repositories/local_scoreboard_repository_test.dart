@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tictactoe/core/storage/in_memory_key_value_storage.dart';
-import 'package:tictactoe/features/game/data/datasources/game_storage_keys.dart';
-import 'package:tictactoe/features/game/data/datasources/local_game_preferences_data_source.dart';
+import 'package:tictactoe/features/game/data/datasources/local_scoreboard_data_source.dart';
 import 'package:tictactoe/features/game/data/repositories/local_scoreboard_repository.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/scoreboard.dart';
+
+import '../../../../testing/in_memory_key_value_storage.dart';
 
 void main() {
   late InMemoryKeyValueStorage storage;
@@ -12,9 +12,7 @@ void main() {
 
   setUp(() {
     storage = InMemoryKeyValueStorage();
-    repository = LocalScoreboardRepository(
-      LocalGamePreferencesDataSource(storage),
-    );
+    repository = LocalScoreboardRepository(LocalScoreboardDataSource(storage));
   });
 
   test('returns an empty scoreboard when none is saved', () async {
@@ -22,13 +20,13 @@ void main() {
   });
 
   test('returns an empty scoreboard when saved json is invalid', () async {
-    await storage.writeString(GameStorageKeys.scoreboard, 'not-json');
+    await storage.writeString('scoreboard', 'not-json');
 
     expect(await repository.load(), Scoreboard.empty());
   });
 
   test('returns an empty scoreboard when saved json is incomplete', () async {
-    await storage.writeString(GameStorageKeys.scoreboard, '{"humanWins":1}');
+    await storage.writeString('scoreboard', '{"humanWins":1}');
 
     expect(await repository.load(), Scoreboard.empty());
   });

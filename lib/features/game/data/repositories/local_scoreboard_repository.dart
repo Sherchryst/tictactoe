@@ -1,4 +1,4 @@
-import 'package:tictactoe/features/game/data/datasources/local_game_preferences_data_source.dart';
+import 'package:tictactoe/features/game/data/datasources/local_scoreboard_data_source.dart';
 import 'package:tictactoe/features/game/data/models/scoreboard_dto.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/scoreboard.dart';
@@ -7,7 +7,7 @@ import 'package:tictactoe/features/game/domain/repositories/scoreboard_repositor
 final class LocalScoreboardRepository implements ScoreboardRepository {
   LocalScoreboardRepository(this._dataSource);
 
-  final LocalGamePreferencesDataSource _dataSource;
+  final LocalScoreboardDataSource _dataSource;
   Future<void> _mutationQueue = Future<void>.value();
 
   @override

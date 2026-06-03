@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:tictactoe/app/di/game_dependencies.dart';
+import 'package:tictactoe/core/di/game_dependencies.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/scoreboard.dart';
 

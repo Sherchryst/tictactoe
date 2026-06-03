@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import 'package:tictactoe/app/di/game_dependencies.dart';
+import 'package:tictactoe/core/di/game_dependencies.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/presentation/controllers/game_view_state.dart';

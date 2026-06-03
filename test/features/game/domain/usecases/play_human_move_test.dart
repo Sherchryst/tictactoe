@@ -10,8 +10,8 @@ import 'package:tictactoe/features/game/domain/services/cpu_strategy_resolver.da
 import 'package:tictactoe/features/game/domain/usecases/play_cpu_turn.dart';
 import 'package:tictactoe/features/game/domain/usecases/play_human_move.dart';
 
-import 'package:tictactoe/testing/mock_stubs.dart';
-import 'package:tictactoe/testing/mocks.mocks.dart';
+import '../../../../testing/mock_stubs.dart';
+import '../../../../testing/mocks.mocks.dart';
 
 _Harness _harness({int cpuMove = 8}) {
   final strategy = MockCpuStrategy();
