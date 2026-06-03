@@ -7,7 +7,11 @@ import_lint:
       not_allowed_imports:
         - 'lib/features/*/data/**'
         - 'lib/features/*/presentation/**'
-        - 'lib/design_system/**'
+        - 'lib/features/*/infrastructure/**'
+        - 'lib/core/design_system/**'
+        - 'lib/core/di/**'
+        - 'lib/core/router/**'
+        - 'lib/core/storage/**'
         - 'package:flutter/**'
         - 'package:flutter_riverpod/**'
         - 'package:hooks_riverpod/**'
@@ -15,16 +19,52 @@ import_lint:
         - 'package:shared_preferences/**'
       excluded_imports: []
     design_system_isolation:
-      target_file_path: 'lib/design_system/**.dart'
+      target_file_path: 'lib/core/design_system/**.dart'
       not_allowed_imports:
         - 'lib/features/**'
-        - 'lib/app/**'
+        - 'lib/core/di/**'
+        - 'lib/core/router/**'
         - 'lib/core/storage/**'
+      excluded_imports: []
+    core_audio_domain_isolation:
+      target_file_path: 'lib/core/audio/domain/**.dart'
+      not_allowed_imports:
+        - 'lib/features/**'
+        - 'lib/core/audio/data/**'
+        - 'lib/core/audio/infrastructure/**'
+        - 'lib/core/design_system/**'
+        - 'lib/core/di/**'
+        - 'lib/core/router/**'
+        - 'lib/core/storage/**'
+        - 'package:flutter/**'
+        - 'package:flutter_riverpod/**'
+        - 'package:hooks_riverpod/**'
+        - 'package:go_router/**'
+        - 'package:shared_preferences/**'
+      excluded_imports: []
+    core_audio_data_isolation:
+      target_file_path: 'lib/core/audio/data/**.dart'
+      not_allowed_imports:
+        - 'lib/features/**'
+        - 'lib/core/audio/infrastructure/**'
+        - 'lib/core/di/**'
+        - 'lib/core/router/**'
+        - 'package:flutter/widgets.dart'
+        - 'package:flutter/material.dart'
+        - 'package:go_router/**'
+      excluded_imports: []
+    core_audio_infrastructure_isolation:
+      target_file_path: 'lib/core/audio/infrastructure/**.dart'
+      not_allowed_imports:
+        - 'lib/features/**'
+        - 'lib/core/router/**'
       excluded_imports: []
     data_isolation:
       target_file_path: 'lib/features/*/data/**.dart'
       not_allowed_imports:
         - 'lib/features/*/presentation/**'
+        - 'lib/core/di/**'
+        - 'lib/core/router/**'
         - 'package:flutter/widgets.dart'
         - 'package:flutter/material.dart'
         - 'package:go_router/**'
@@ -33,4 +73,11 @@ import_lint:
       target_file_path: 'lib/features/*/presentation/**.dart'
       not_allowed_imports:
         - 'lib/features/*/data/**'
+        - 'lib/features/*/infrastructure/**'
+        - 'lib/core/storage/**'
+      excluded_imports: []
+    settings_feature_isolation:
+      target_file_path: 'lib/features/settings/**.dart'
+      not_allowed_imports:
+        - 'lib/features/game/**'
       excluded_imports: []

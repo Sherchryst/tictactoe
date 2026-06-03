@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import 'package:tictactoe/app/di/audio_providers.dart';
-import 'package:tictactoe/app/router/app_router.dart';
-import 'package:tictactoe/design_system/theme/app_palette.dart';
-import 'package:tictactoe/design_system/theme/app_theme.dart';
-import 'package:tictactoe/features/game/domain/entities/app_preferences.dart';
-import 'package:tictactoe/features/game/presentation/game_copy.dart';
-import 'package:tictactoe/features/game/presentation/settings/controllers/settings_controller.dart';
+import 'package:tictactoe/core/design_system/theme/app_palette.dart';
+import 'package:tictactoe/core/design_system/theme/app_theme.dart';
+import 'package:tictactoe/core/di/audio_providers.dart';
+import 'package:tictactoe/core/router/app_router.dart';
+import 'package:tictactoe/features/settings/domain/entities/app_preferences.dart';
+import 'package:tictactoe/features/settings/presentation/controllers/settings_controller.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
 
 class TicTacToeApp extends ConsumerWidget {
@@ -25,7 +23,7 @@ class TicTacToeApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(audioSettingsProvider);
+    ref.watch(audioPreferencesProvider);
 
     final router = ref.watch(appRouterProvider);
     final settings = ref.watch(settingsControllerProvider);
@@ -33,7 +31,7 @@ class TicTacToeApp extends ConsumerWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: _systemOverlay,
       child: MaterialApp.router(
-        title: GameCopy.appTitle,
+        title: 'Tic Tac Toe',
         debugShowCheckedModeBanner: false,
         darkTheme: AppTheme.dark(),
         locale: settings.when(
