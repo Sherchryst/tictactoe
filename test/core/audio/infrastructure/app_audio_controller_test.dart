@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mockito/mockito.dart';
+import 'package:tictactoe/core/assets/audio_assets.dart';
 import 'package:tictactoe/core/audio/domain/entities/audio_preferences.dart';
 import 'package:tictactoe/core/audio/domain/entities/music_track.dart';
 import 'package:tictactoe/core/audio/infrastructure/app_audio_controller.dart';
-import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
 import 'package:tictactoe/core/di/audio_dependencies.dart';
 
 import '../../../testing/mock_stubs.dart';
@@ -88,7 +88,7 @@ void main() {
         );
         final controller = container.read(appAudioControllerProvider.notifier);
 
-        await controller.playTrack(MusicTrack.game);
+        await controller.playTrack(MusicTrack.radahn);
         verifyNever(
           musicPlayer.play(
             any,
@@ -104,7 +104,7 @@ void main() {
 
         verify(
           musicPlayer.play(
-            AppAssets.gameMusic,
+            AudioAssets.radahnMusic,
             targetVolume: AudioPreferences.defaultMusicVolume,
             transitionDuration: anyNamed('transitionDuration'),
             startAt: Duration.zero,
@@ -130,12 +130,53 @@ void main() {
 
       verify(
         musicPlayer.play(
-          AppAssets.musicLoop,
+          AudioAssets.musicLoop,
           targetVolume: AudioPreferences.defaultMusicVolume,
           transitionDuration: anyNamed('transitionDuration'),
           startAt: const Duration(seconds: 12),
         ),
       ).called(1);
+    });
+
+    test(
+      'prepares the requested boss track instead of Recusants by default',
+      () async {
+        final repository = MockAudioPreferencesRepository();
+        final musicPlayer = MockMusicPlayer();
+        stubAudioPreferencesRepository(repository);
+        final container = createContainer(
+          repository: repository,
+          musicPlayer: musicPlayer,
+        );
+        final controller = container.read(appAudioControllerProvider.notifier);
+        await container.pump();
+        await Future<void>.delayed(Duration.zero);
+        clearInteractions(musicPlayer);
+
+        await controller.playTrack(MusicTrack.mohg);
+        await controller.prepareGame();
+
+        verify(musicPlayer.prepare(AudioAssets.mohgMusic)).called(1);
+        verifyNever(musicPlayer.prepare(AudioAssets.recusantsMusic));
+      },
+    );
+
+    test('prepares Recusants by default for non-boss fights', () async {
+      final repository = MockAudioPreferencesRepository();
+      final musicPlayer = MockMusicPlayer();
+      stubAudioPreferencesRepository(repository);
+      final container = createContainer(
+        repository: repository,
+        musicPlayer: musicPlayer,
+      );
+      final controller = container.read(appAudioControllerProvider.notifier);
+      await container.pump();
+      await Future<void>.delayed(Duration.zero);
+      clearInteractions(musicPlayer);
+
+      await controller.prepareGame();
+
+      verify(musicPlayer.prepare(AudioAssets.recusantsMusic)).called(1);
     });
   });
 }
