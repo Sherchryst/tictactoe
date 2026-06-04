@@ -2,25 +2,27 @@
 
 Application Flutter de Tic Tac Toe inspirée d'Elden Ring.
 
-Le jeu reste volontairement simple: un duel local sur une grille 3x3. Tout ce
-qui l'entoure a en revanche été travaillé comme une vraie mini-application:
+Le coeur reste une grille 3x3, mais l'application porte maintenant plusieurs
+flows de jeu: duel local, essai guidé contre CPU et run No Mercy contre les
+boss. Tout ce qui l'entoure a été travaillé comme une vraie mini-application:
 écrans cinématiques, audio, préférences persistées, score, localisation,
 design system et garde-fous d'architecture.
 
 ## Fonctionnalités
 
-- Duel local en 3x3.
+- Grille de jeu 3x3.
 - Mode `NEW DUEL`: joueur contre joueur sur le même appareil.
-- Mode `NEW GAME`: joueur contre CPU.
-- Difficultés CPU:
-  - `Guided`: coup légal aléatoire.
-  - `No Mercy`: stratégie minimax déterministe.
-- Score persistant pour les parties joueur contre CPU.
-- Réinitialisation du score via `Rest at Grace`.
-- Réglages persistants: musique, effets sonores, volumes et langue.
+- Mode `NEW GAME`: choix entre `GUIDED` et `NO MERCY`.
+- Mode `GUIDED`: duel joueur contre CPU avec coup légal aléatoire.
+- Mode `NO MERCY`: run contre Radahn, Mohg puis Malenia, avec patterns de boss,
+  progression persistée, continue, NG+ et crédits déblocables.
+- Record Tarnished persistant pour les combats No Mercy.
+- Réinitialisation du score via `REST AT GRACE`, avec confirmation configurable.
+- Réglages persistants: musique, effets sonores, volumes, langue et
+  confirmation de reset score.
 - Interface localisée en anglais, français, espagnol et allemand.
-- Flux complet: splash, écran titre, menu, loading, partie, fin de partie,
-  score et système.
+- Flux complet: splash, écran titre, home menu, loading de partie, jeu, fin de
+  partie, score, crédits et système.
 - Audio via `just_audio`: musique en boucle, transitions, SFX préchauffés et
   volume de sortie plafonné.
 - Build web compatible Firebase Hosting.
@@ -48,7 +50,7 @@ Depuis un clone propre:
 ```bash
 flutter pub get
 flutter gen-l10n
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter run
 ```
 
@@ -75,7 +77,7 @@ flutter test
 Après modification de providers, modèles Freezed, DTO JSON ou mocks:
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 Après modification des fichiers `.arb`:
@@ -108,18 +110,17 @@ lib/
 │   │   ├── tokens/                   # Assets, spacing, durées, typo, etc.
 │   │   └── widgets/                  # Widgets UI partagés
 │   ├── di/                           # Providers Riverpod transverses
+│   ├── preferences/                  # Préférences app partagées
 │   ├── router/                       # Routes go_router et transitions
 │   └── storage/                      # Abstraction KeyValueStorage
 └── features/
-    ├── shell/
-    │   └── presentation/             # Splash, title, home, loading
+    ├── launch/
+    │   └── presentation/             # Splash et écran titre
     ├── game/
     │   ├── domain/                   # Entités, règles, CPU, use cases
-    │   ├── data/                     # Scoreboard local
-    │   └── presentation/             # Page de jeu, board, dialogs, contrôleurs
+    │   ├── data/                     # Scoreboard et run No Mercy locaux
+    │   └── presentation/             # Home, loading, jeu, score, dialogs
     └── settings/
-        ├── domain/                   # AppPreferences, use cases
-        ├── data/                     # Persistance locale des préférences
         └── presentation/             # Écran système, audio, langue
 ```
 
@@ -130,6 +131,7 @@ Les règles principales:
 - `presentation` contient widgets, hooks, contrôleurs Riverpod, dialogs et animations.
 - `core/di` assemble les dépendances concrètes.
 - `core/design_system` reste indépendant des features.
+- `core/preferences` porte les préférences partagées entre l'app et l'écran système.
 
 Les routes principales:
 
@@ -146,13 +148,14 @@ Le domaine du jeu se trouve dans `lib/features/game/domain`.
 - `GameRules`: détection des victoires, égalités et parties en cours.
 - `PlayMove`: applique un coup valide.
 - `PlayHumanMove`: joue le coup humain puis déclenche le CPU si nécessaire.
-- `PlayCpuTurn`: choisit la stratégie CPU selon la difficulté.
-- `RandomCpuStrategy`: difficulté `Guided`.
-- `MinimaxCpuStrategy`: difficulté `No Mercy`.
-- `Scoreboard`: compteur des victoires, défaites, égalités et parties jouées.
+- `PlayCpuTurn`: choisit la stratégie CPU selon le mode.
+- `RandomCpuStrategy`: CPU de l'essai `GUIDED`.
+- `BossPuzzleCpuStrategy`: patterns déterministes des boss No Mercy.
+- `NoMercyRunProgression`: enchaînement Radahn → Mohg → Malenia et cycles NG+.
+- `Scoreboard`: record Tarnished agrégé depuis les scores par boss.
 
-Le `GameController` enregistre le score uniquement en mode joueur contre CPU.
-Les duels joueur contre joueur ne modifient pas le scoreboard.
+Le `GameController` enregistre le score uniquement pour les combats No Mercy.
+Les duels locaux et l'essai guidé ne modifient pas le scoreboard.
 
 ## Persistance
 
@@ -161,9 +164,11 @@ La persistance passe par `KeyValueStorage`, implémenté avec
 
 Données persistées:
 
-- scoreboard solo;
+- scoreboard No Mercy;
+- progression No Mercy;
 - préférences audio;
-- langue sélectionnée.
+- langue sélectionnée;
+- préférence de confirmation du reset score.
 
 Cette abstraction permet de tester les repositories avec un storage en mémoire
 sans importer `shared_preferences` dans les couches métier ou présentation.
@@ -173,7 +178,7 @@ sans importer `shared_preferences` dans les couches métier ou présentation.
 La présentation déclenche des intentions audio, pas des chemins d'assets.
 
 - Menu: `MenuSfx.select`, `MenuSfx.activate`, `MenuSfx.reset`.
-- Musique: `MusicTrack.menu`, `MusicTrack.game`.
+- Musique: `MusicTrack.menu`, `MusicTrack.recusants` et musiques de boss.
 - Partie: coup joué, parry, victoire, mort, égalité, redémarrage.
 
 `AppAudioController` mappe ces intentions vers `AppAssets`. La musique passe
@@ -215,7 +220,7 @@ Commande de régénération complète:
 
 ```bash
 flutter gen-l10n
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 `build.yaml` limite la génération Mockito aux fichiers de test et de support.
@@ -225,8 +230,9 @@ dart run build_runner build --delete-conflicting-outputs
 ```text
 test/
 ├── core/audio/                       # Audio domain/data/infrastructure
+├── core/preferences/                 # Préférences app partagées
 ├── features/game/                    # Domaine, data et contrôleurs du jeu
-├── features/settings/                # Préférences et contrôleurs settings
+├── features/settings/                # Écran système et contrôleurs settings
 ├── testing/                          # Mocks, stubs, storage mémoire
 └── widget_test.dart
 ```
@@ -235,18 +241,20 @@ Les tests suivent les couches de l'application:
 
 - domaine: entités, règles, stratégies CPU, use cases;
 - data: DTO, data sources, repositories;
-- présentation: contrôleurs Riverpod et états exposés.
+- présentation: contrôleurs Riverpod, dialogs, pages, widgets et smoke tests
+  layout compact/desktop.
 
 ## Garde-fous d'imports
 
-`import_lint.yaml` protège les frontières principales:
+`import_analysis_options.yaml` protège les frontières principales:
 
 - le domaine des features ne dépend pas de Flutter, Riverpod, data ou présentation;
 - la data ne dépend pas de la présentation;
 - la présentation n'importe pas les implémentations data;
 - `core/audio/domain` reste indépendant de l'infrastructure;
+- `core/preferences/domain` reste indépendant de la data et des features;
 - `core/design_system` reste indépendant des features;
-- `features/settings` ne dépend pas de `features/game`.
+- `features/settings` et `features/game` ne dépendent pas directement l'une de l'autre.
 
 À lancer avec:
 
