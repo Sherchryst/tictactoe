@@ -4,8 +4,13 @@ rules:
     not_allow_import_reg_exps:
       - "package:tictactoe/features/game/data/.*"
       - "package:tictactoe/features/game/presentation/.*"
+      - "package:tictactoe/core/design_system/.*"
+      - "package:tictactoe/core/di/.*"
+      - "package:tictactoe/core/router/.*"
+      - "package:tictactoe/core/storage/.*"
       - "package:flutter/.*"
       - "package:flutter_riverpod/.*"
+      - "package:hooks_riverpod/.*"
       - "package:go_router/.*"
       - "package:shared_preferences/.*"
     ignore_import_reg_exps: []
@@ -18,8 +23,66 @@ rules:
       - "package:go_router/.*"
     ignore_import_reg_exps: []
 
-  game_presentation_must_not_depend_on_data:
+  game_presentation_must_not_depend_on_data_or_settings:
     search_file_path_reg_exp: "lib/features/game/presentation/.*\\.dart"
     not_allow_import_reg_exps:
+      - "package:tictactoe/features/game/data/.*"
+      - "package:tictactoe/features/settings/.*"
+    ignore_import_reg_exps: []
+
+  settings_must_not_depend_on_game:
+    search_file_path_reg_exp: "lib/features/settings/.*\\.dart"
+    not_allow_import_reg_exps:
+      - "package:tictactoe/features/game/.*"
+    ignore_import_reg_exps: []
+
+  launch_must_not_depend_on_game:
+    search_file_path_reg_exp: "lib/features/launch/.*\\.dart"
+    not_allow_import_reg_exps:
+      - "package:tictactoe/features/game/.*"
+    ignore_import_reg_exps: []
+
+  core_preferences_domain_must_stay_pure:
+    search_file_path_reg_exp: "lib/core/preferences/domain/.*\\.dart"
+    not_allow_import_reg_exps:
+      - "package:tictactoe/features/.*"
+      - "package:tictactoe/core/preferences/data/.*"
+      - "package:tictactoe/core/preferences/application/.*"
+      - "package:tictactoe/core/di/.*"
+      - "package:tictactoe/core/router/.*"
+      - "package:tictactoe/core/storage/.*"
+      - "package:flutter/.*"
+      - "package:flutter_riverpod/.*"
+      - "package:hooks_riverpod/.*"
+      - "package:go_router/.*"
+      - "package:shared_preferences/.*"
+    ignore_import_reg_exps: []
+
+  core_preferences_data_must_not_depend_on_features_or_application:
+    search_file_path_reg_exp: "lib/core/preferences/data/.*\\.dart"
+    not_allow_import_reg_exps:
+      - "package:tictactoe/features/.*"
+      - "package:tictactoe/core/preferences/application/.*"
+      - "package:tictactoe/core/di/.*"
+      - "package:tictactoe/core/router/.*"
+      - "package:flutter/material.dart"
+      - "package:flutter/widgets.dart"
+      - "package:go_router/.*"
+    ignore_import_reg_exps: []
+
+  core_preferences_application_must_not_depend_on_features_or_router:
+    search_file_path_reg_exp: "lib/core/preferences/application/.*\\.dart"
+    not_allow_import_reg_exps:
+      - "package:tictactoe/features/.*"
+      - "package:tictactoe/core/router/.*"
+      - "package:flutter/material.dart"
+      - "package:flutter/widgets.dart"
+      - "package:go_router/.*"
+    ignore_import_reg_exps: []
+
+  router_must_not_depend_on_game_domain_or_data:
+    search_file_path_reg_exp: "lib/core/router/.*\\.dart"
+    not_allow_import_reg_exps:
+      - "package:tictactoe/features/game/domain/.*"
       - "package:tictactoe/features/game/data/.*"
     ignore_import_reg_exps: []
