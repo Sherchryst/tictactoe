@@ -1,144 +1,67 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:tictactoe/features/game/domain/entities/board.dart';
-import 'package:tictactoe/features/game/domain/entities/cell.dart';
+import 'package:tictactoe/features/game/domain/entities/cpu_boss.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/game_session.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
-import 'package:tictactoe/features/game/domain/entities/player.dart';
-import 'package:tictactoe/features/game/domain/services/cpu_strategy_resolver.dart';
-import 'package:tictactoe/features/game/domain/usecases/play_cpu_turn.dart';
+import 'package:tictactoe/features/game/domain/entities/mark.dart';
+import 'package:tictactoe/features/game/domain/services/boss_pattern_catalog.dart';
 import 'package:tictactoe/features/game/domain/usecases/play_human_move.dart';
 
-import '../../../../testing/mock_stubs.dart';
-import '../../../../testing/mocks.mocks.dart';
-
-_Harness _harness({int cpuMove = 8}) {
-  final strategy = MockCpuStrategy();
-  stubCpuStrategy(strategy, move: cpuMove);
-  final resolver = CpuStrategyResolver(
-    easyStrategy: strategy,
-    hardStrategy: strategy,
-  );
-
-  return _Harness(
-    strategy: strategy,
-    useCase: PlayHumanMove(
-      playCpuTurn: PlayCpuTurn(strategyResolver: resolver),
-    ),
-  );
-}
-
 void main() {
+  const useCase = PlayHumanMove();
+
   group('PlayHumanMove', () {
     test('keeps the session unchanged when the cell is not playable', () {
-      final harness = _harness();
-      final session = GameSession.newGame(
-        const GameSetup(difficulty: GameDifficulty.easy),
-      );
+      final session = GameSession.newGame(GameSetup.guidedTrial());
 
-      expect(harness.useCase(session, -1), session);
-      verifyNever(harness.strategy.chooseMove(any, any));
+      expect(useCase(session, -1), session);
     });
 
-    test('plays the human move then the cpu move', () {
-      final harness = _harness();
-      final session = GameSession.newGame(
-        const GameSetup(difficulty: GameDifficulty.easy),
-      );
+    test('plays only the human move in guided mode', () {
+      final session = GameSession.newGame(GameSetup.guidedTrial());
 
-      final nextSession = harness.useCase(session, 0);
+      final nextSession = useCase(session, 0);
 
-      expect(nextSession.board.cellAt(0), Cell.human);
-      expect(nextSession.board.cellAt(8), Cell.cpu);
-      expect(nextSession.currentPlayer, Player.human);
+      expect(nextSession.board.markAt(0), Mark.x);
+      expect(nextSession.currentMark, Mark.o);
+      expect(nextSession.humanMoves, [0]);
+      expect(nextSession.cpuMoves, isEmpty);
       expect(nextSession.result, const GameResult.ongoing());
-      verify(harness.strategy.chooseMove(any, Player.cpu)).called(1);
     });
 
-    test('alternates local players without playing a cpu move', () {
-      final harness = _harness();
-      final session = GameSession.newGame(
-        const GameSetup(mode: GameMode.humanVsHuman),
-      );
+    test('alternates local players without recording cpu puzzle moves', () {
+      final session = GameSession.newGame(GameSetup.localDuel());
 
-      final afterFirstMove = harness.useCase(session, 0);
-      final afterSecondMove = harness.useCase(afterFirstMove, 1);
+      final afterFirstMove = useCase(session, 0);
+      final afterSecondMove = useCase(afterFirstMove, 1);
 
-      expect(afterFirstMove.board.cellAt(0), Cell.human);
-      expect(afterFirstMove.board.cellAt(8), Cell.empty);
-      expect(afterFirstMove.currentPlayer, Player.cpu);
-      expect(afterSecondMove.board.cellAt(1), Cell.cpu);
-      expect(afterSecondMove.currentPlayer, Player.human);
-      verifyNever(harness.strategy.chooseMove(any, any));
+      expect(afterFirstMove.board.markAt(0), Mark.x);
+      expect(afterFirstMove.currentMark, Mark.o);
+      expect(afterFirstMove.humanMoves, isEmpty);
+      expect(afterSecondMove.board.markAt(1), Mark.o);
+      expect(afterSecondMove.currentMark, Mark.x);
     });
 
-    test('does not play the cpu when the human wins', () {
-      final harness = _harness();
-      final session = GameSession(
-        board: Board(
-          cells: [
-            Cell.human,
-            Cell.human,
-            Cell.empty,
-            Cell.cpu,
-            Cell.cpu,
-            Cell.empty,
-            Cell.empty,
-            Cell.empty,
-            Cell.empty,
-          ],
-        ),
-        currentPlayer: Player.human,
-        difficulty: GameDifficulty.easy,
-        result: const GameResult.ongoing(),
+    test('keeps weakness intact while the No Mercy prefix matches', () {
+      final session = GameSession.newGame(GameSetup.noMercy(CpuBossId.radahn));
+
+      final nextSession = useCase(
+        session,
+        BossPatterns.radahn.humanMoves.first,
       );
 
-      final nextSession = harness.useCase(session, 2);
-
-      expect(
-        nextSession.result,
-        const GameResult.win(winner: Player.human, winningCells: [0, 1, 2]),
-      );
-      expect(nextSession.board.cellAt(8), Cell.empty);
-      verifyNever(harness.strategy.chooseMove(any, any));
+      expect(nextSession.weaknessBroken, isFalse);
+      expect(nextSession.humanMoves, [BossPatterns.radahn.humanMoves.first]);
     });
 
-    test('lets the cpu finish the game after a human move', () {
-      final harness = _harness(cpuMove: 2);
-      final session = GameSession(
-        board: Board(
-          cells: [
-            Cell.cpu,
-            Cell.cpu,
-            Cell.empty,
-            Cell.human,
-            Cell.human,
-            Cell.empty,
-            Cell.empty,
-            Cell.empty,
-            Cell.empty,
-          ],
-        ),
-        currentPlayer: Player.human,
-        difficulty: GameDifficulty.easy,
-        result: const GameResult.ongoing(),
-      );
+    test('breaks the weakness when the No Mercy prefix deviates', () {
+      final session = GameSession.newGame(GameSetup.noMercy(CpuBossId.radahn));
+      final wrongMove = BossPatterns.radahn.humanMoves.first == 0 ? 1 : 0;
 
-      final nextSession = harness.useCase(session, 8);
+      final nextSession = useCase(session, wrongMove);
 
-      expect(
-        nextSession.result,
-        const GameResult.win(winner: Player.cpu, winningCells: [0, 1, 2]),
-      );
-      verify(harness.strategy.chooseMove(any, Player.cpu)).called(1);
+      expect(nextSession.weaknessBroken, isTrue);
+      expect(nextSession.humanMoves, [wrongMove]);
     });
   });
-}
-
-final class _Harness {
-  const _Harness({required this.strategy, required this.useCase});
-
-  final MockCpuStrategy strategy;
-  final PlayHumanMove useCase;
 }

@@ -1,37 +1,39 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
+import 'package:tictactoe/features/game/domain/services/boss_puzzle_cpu_strategy.dart';
 import 'package:tictactoe/features/game/domain/services/cpu_strategy_resolver.dart';
-import 'package:tictactoe/features/game/domain/services/minimax_cpu_strategy.dart';
 import 'package:tictactoe/features/game/domain/services/random_cpu_strategy.dart';
 
 import '../../../../testing/mocks.mocks.dart';
 
 void main() {
   group('CpuStrategyResolver', () {
-    test('returns the easy strategy for easy difficulty', () {
+    test('returns guided strategy for guided and local modes', () {
       final resolver = CpuStrategyResolver();
 
-      expect(resolver.resolve(GameDifficulty.easy), isA<RandomCpuStrategy>());
+      expect(resolver.resolve(GameMode.guidedTrial), isA<RandomCpuStrategy>());
+      expect(resolver.resolve(GameMode.localDuel), isA<RandomCpuStrategy>());
     });
 
-    test('returns the minimax strategy for hard difficulty', () {
+    test('returns boss puzzle strategy for No Mercy', () {
       final resolver = CpuStrategyResolver();
 
-      expect(resolver.resolve(GameDifficulty.hard), isA<MinimaxCpuStrategy>());
+      expect(
+        resolver.resolve(GameMode.noMercyRun),
+        isA<BossPuzzleCpuStrategy>(),
+      );
     });
 
-    test('honors easy strategy overrides', () {
-      final injected = MockCpuStrategy();
-      final resolver = CpuStrategyResolver(easyStrategy: injected);
+    test('honors injected strategies', () {
+      final guided = MockCpuStrategy();
+      final noMercy = MockCpuStrategy();
+      final resolver = CpuStrategyResolver(
+        guidedStrategy: guided,
+        noMercyStrategy: noMercy,
+      );
 
-      expect(resolver.resolve(GameDifficulty.easy), same(injected));
-    });
-
-    test('honors hard strategy overrides', () {
-      final injected = MockCpuStrategy();
-      final resolver = CpuStrategyResolver(hardStrategy: injected);
-
-      expect(resolver.resolve(GameDifficulty.hard), same(injected));
+      expect(resolver.resolve(GameMode.guidedTrial), same(guided));
+      expect(resolver.resolve(GameMode.noMercyRun), same(noMercy));
     });
   });
 }

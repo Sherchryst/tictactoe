@@ -1,91 +1,90 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tictactoe/features/game/domain/entities/board.dart';
-import 'package:tictactoe/features/game/domain/entities/cell.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
-import 'package:tictactoe/features/game/domain/entities/player.dart';
+import 'package:tictactoe/features/game/domain/entities/mark.dart';
 import 'package:tictactoe/features/game/domain/services/game_rules.dart';
 
 void main() {
   const rules = GameRules();
 
-  Board boardWith(List<Cell> cells) => Board(cells: cells);
+  Board boardWith(List<Mark?> cells) => Board(cells: cells);
 
   group('GameRules', () {
     test('detects a row win', () {
       final result = rules.evaluate(
         boardWith([
-          Cell.human,
-          Cell.human,
-          Cell.human,
-          Cell.empty,
-          Cell.cpu,
-          Cell.empty,
-          Cell.cpu,
-          Cell.empty,
-          Cell.empty,
+          Mark.x,
+          Mark.x,
+          Mark.x,
+          null,
+          Mark.o,
+          null,
+          Mark.o,
+          null,
+          null,
         ]),
       );
 
       expect(
         result,
-        const GameResult.win(winner: Player.human, winningCells: [0, 1, 2]),
+        const GameResult.win(winner: Mark.x, winningCells: [0, 1, 2]),
       );
     });
 
     test('detects a column win', () {
       final result = rules.evaluate(
         boardWith([
-          Cell.cpu,
-          Cell.human,
-          Cell.empty,
-          Cell.cpu,
-          Cell.human,
-          Cell.empty,
-          Cell.cpu,
-          Cell.empty,
-          Cell.human,
+          Mark.o,
+          Mark.x,
+          null,
+          Mark.o,
+          Mark.x,
+          null,
+          Mark.o,
+          null,
+          Mark.x,
         ]),
       );
 
       expect(
         result,
-        const GameResult.win(winner: Player.cpu, winningCells: [0, 3, 6]),
+        const GameResult.win(winner: Mark.o, winningCells: [0, 3, 6]),
       );
     });
 
     test('detects a diagonal win', () {
       final result = rules.evaluate(
         boardWith([
-          Cell.human,
-          Cell.cpu,
-          Cell.empty,
-          Cell.cpu,
-          Cell.human,
-          Cell.empty,
-          Cell.empty,
-          Cell.empty,
-          Cell.human,
+          Mark.x,
+          Mark.o,
+          null,
+          Mark.o,
+          Mark.x,
+          null,
+          null,
+          null,
+          Mark.x,
         ]),
       );
 
       expect(
         result,
-        const GameResult.win(winner: Player.human, winningCells: [0, 4, 8]),
+        const GameResult.win(winner: Mark.x, winningCells: [0, 4, 8]),
       );
     });
 
     test('detects a draw', () {
       final result = rules.evaluate(
         boardWith([
-          Cell.human,
-          Cell.cpu,
-          Cell.human,
-          Cell.human,
-          Cell.cpu,
-          Cell.cpu,
-          Cell.cpu,
-          Cell.human,
-          Cell.human,
+          Mark.x,
+          Mark.o,
+          Mark.x,
+          Mark.x,
+          Mark.o,
+          Mark.o,
+          Mark.o,
+          Mark.x,
+          Mark.x,
         ]),
       );
 
@@ -94,17 +93,7 @@ void main() {
 
     test('keeps an unfinished board ongoing', () {
       final result = rules.evaluate(
-        boardWith([
-          Cell.human,
-          Cell.cpu,
-          Cell.empty,
-          Cell.empty,
-          Cell.empty,
-          Cell.empty,
-          Cell.empty,
-          Cell.empty,
-          Cell.empty,
-        ]),
+        boardWith([Mark.x, Mark.o, null, null, null, null, null, null, null]),
       );
 
       expect(result, const GameResult.ongoing());
