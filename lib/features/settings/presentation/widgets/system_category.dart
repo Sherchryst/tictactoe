@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'package:tictactoe/l10n/app_localizations.dart';
 
-enum SystemCategory { audio, language }
+enum SystemCategory { audio, score, language }
 
 extension SystemCategoryX on SystemCategory {
   String title(AppLocalizations copy) {
     return switch (this) {
       SystemCategory.audio => copy.soundOptionsTitle,
+      SystemCategory.score => copy.scoreOptionsTitle,
       SystemCategory.language => copy.languageOptionsTitle,
     };
   }
@@ -15,6 +16,7 @@ extension SystemCategoryX on SystemCategory {
   String shortLabel(AppLocalizations copy) {
     return switch (this) {
       SystemCategory.audio => copy.audioTitle,
+      SystemCategory.score => copy.scoreTitle,
       SystemCategory.language => copy.languageTitle,
     };
   }
@@ -22,6 +24,7 @@ extension SystemCategoryX on SystemCategory {
   IconData get icon {
     return switch (this) {
       SystemCategory.audio => Icons.graphic_eq_rounded,
+      SystemCategory.score => Icons.history_rounded,
       SystemCategory.language => Icons.language_rounded,
     };
   }
@@ -34,6 +37,10 @@ extension SystemCategoryX on SystemCategory {
         2 => copy.audioSfxToggleHelp,
         3 => copy.audioSfxVolumeHelp,
         _ => copy.audioDefaultHelp,
+      },
+      SystemCategory.score => switch (focusedRowIndex) {
+        0 => copy.scoreResetConfirmationHelp,
+        _ => copy.scoreDefaultHelp,
       },
       SystemCategory.language => switch (focusedRowIndex) {
         0 => copy.languageEnglishHelp,

@@ -5,6 +5,7 @@ import 'package:tictactoe/core/design_system/tokens/app_breakpoints.dart';
 import 'package:tictactoe/features/settings/presentation/controllers/settings_view_state.dart';
 import 'package:tictactoe/features/settings/presentation/widgets/sections/audio_settings_section.dart';
 import 'package:tictactoe/features/settings/presentation/widgets/sections/language_settings_section.dart';
+import 'package:tictactoe/features/settings/presentation/widgets/sections/score_settings_section.dart';
 import 'package:tictactoe/features/settings/presentation/widgets/system_category.dart';
 
 class SettingsContent extends ConsumerWidget {
@@ -34,6 +35,11 @@ class SettingsContent extends ConsumerWidget {
       ),
       child: switch (category) {
         SystemCategory.audio => AudioSettingsSection(
+          focusedRowIndex: focusedRowIndex,
+          onFocusRow: onFocusRow,
+        ),
+        SystemCategory.score => ScoreSettingsSection(
+          state: state,
           focusedRowIndex: focusedRowIndex,
           onFocusRow: onFocusRow,
         ),
