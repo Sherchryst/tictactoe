@@ -1,45 +1,24 @@
-import 'dart:convert';
-
+import 'package:tictactoe/core/storage/json_key_value_store.dart';
 import 'package:tictactoe/core/storage/key_value_storage.dart';
 import 'package:tictactoe/features/game/data/models/scoreboard_dto.dart';
 
 final class LocalScoreboardDataSource {
-  const LocalScoreboardDataSource(this._storage);
+  LocalScoreboardDataSource(KeyValueStorage storage)
+    : _jsonStore = JsonKeyValueStore(storage);
 
-  static const _scoreboardKey = 'scoreboard';
+  static const _scoreboardKey = 'no_mercy_scoreboard_v1';
 
-  final KeyValueStorage _storage;
+  final JsonKeyValueStore _jsonStore;
 
   Future<ScoreboardDto?> loadScoreboard() async {
-    final json = await _storage.readString(_scoreboardKey);
-    if (json == null) {
-      return null;
-    }
-
-    return _decodeObject(json, ScoreboardDto.fromJson);
+    return _jsonStore.readObject(_scoreboardKey, ScoreboardDto.fromJson);
   }
 
   Future<void> saveScoreboard(ScoreboardDto scoreboard) {
-    return _storage.writeString(
-      _scoreboardKey,
-      jsonEncode(scoreboard.toJson()),
-    );
+    return _jsonStore.writeObject(_scoreboardKey, scoreboard.toJson());
   }
 
   Future<void> resetScoreboard() {
-    return _storage.remove(_scoreboardKey);
-  }
-
-  T? _decodeObject<T>(String raw, T Function(Map<String, dynamic>) fromJson) {
-    try {
-      final decoded = jsonDecode(raw);
-      if (decoded is! Map<String, dynamic>) {
-        return null;
-      }
-
-      return fromJson(decoded);
-    } catch (_) {
-      return null;
-    }
+    return _jsonStore.remove(_scoreboardKey);
   }
 }
