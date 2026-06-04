@@ -3,26 +3,57 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tictactoe/app.dart';
 import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
+import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
 import 'package:tictactoe/core/design_system/widgets/tic_tac_toe_title_logo.dart';
+import 'package:tictactoe/core/di/audio_providers.dart';
 import 'package:tictactoe/core/di/storage_providers.dart';
-import 'package:tictactoe/features/game/domain/entities/board.dart';
+import 'package:tictactoe/features/game/domain/entities/game_session.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
-import 'package:tictactoe/features/game/domain/entities/game_result.dart';
+import 'package:tictactoe/features/game/presentation/controllers/game_view_state.dart';
 import 'package:tictactoe/features/game/presentation/widgets/game_board.dart';
 import 'package:tictactoe/l10n/app_localizations_en.dart';
 import 'package:tictactoe/l10n/app_localizations_fr.dart';
 
 import 'testing/in_memory_key_value_storage.dart';
+import 'testing/mock_stubs.dart';
+import 'testing/mocks.mocks.dart';
+
+const _titleRouteArrivalBuffer = Duration(milliseconds: 700);
+const _titlePromptHiddenCheckLead = Duration(seconds: 4);
+const _homeRouteSettle = Duration(milliseconds: 900);
+const _loadingRouteArrivalBuffer = Duration(seconds: 1);
+const _loadingCinematicBuffer = Duration(seconds: 5);
+const _loadingSealBuffer = Duration(milliseconds: 600);
+const _loadingGameRouteBuffer = Duration(milliseconds: 800);
+const _loadingFinalFrameBuffer = Duration(milliseconds: 200);
+final _boardMarkAssertBuffer =
+    AppDurations.boardMarkReveal + AppDurations.micro;
+
+Future<void> pumpAnimationSteps(
+  WidgetTester tester,
+  Iterable<Duration> steps, {
+  bool settleEachStep = true,
+}) async {
+  for (final step in steps) {
+    await tester.pump(step);
+    if (settleEachStep) {
+      await tester.pump();
+    }
+  }
+}
 
 void main() {
   final en = AppLocalizationsEn();
   final fr = AppLocalizationsFr();
-  const soloOpponentLabel = 'MELANIAA BLADE OF MEQUILLA';
 
   Future<void> pumpApp(WidgetTester tester) async {
+    final audio = MockAudioController();
+    stubAudioController(audio);
+
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          audioControllerProvider.overrideWithValue(audio),
           keyValueStorageProvider.overrideWithValue(InMemoryKeyValueStorage()),
         ],
         child: const TicTacToeApp(),
@@ -32,19 +63,18 @@ void main() {
   }
 
   Future<void> finishSplash(WidgetTester tester) async {
-    await tester.pump(const Duration(milliseconds: 2350));
+    await tester.pump(AppDurations.splashScreen);
     await tester.pump();
   }
 
   Future<void> finishTitleIntro(WidgetTester tester) async {
     await finishSplash(tester);
-    await tester.pump(const Duration(milliseconds: 700));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 2));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 5));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 900));
+    await pumpAnimationSteps(tester, [
+      _titleRouteArrivalBuffer,
+      AppDurations.titleLogoEntranceDelay,
+      AppDurations.titlePromptDelay,
+      AppDurations.titlePrompt,
+    ]);
   }
 
   Future<void> enterHome(WidgetTester tester) async {
@@ -52,19 +82,26 @@ void main() {
     expect(find.text(en.touchScreenPrompt), findsOneWidget);
 
     await tester.tapAt(const Offset(400, 300));
-    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pump(_homeRouteSettle);
     await tester.pumpAndSettle();
   }
 
   Future<void> finishGameLoading(WidgetTester tester) async {
     await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
-    expect(find.text(en.loadingTitle, skipOffstage: false), findsOneWidget);
+    await pumpAnimationSteps(tester, [
+      _loadingRouteArrivalBuffer,
+      _loadingCinematicBuffer,
+      _loadingSealBuffer,
+      _loadingGameRouteBuffer,
+      _loadingFinalFrameBuffer,
+    ], settleEachStep: false);
+  }
 
-    await tester.pump(const Duration(seconds: 5));
-    await tester.pump(const Duration(milliseconds: 600));
-    await tester.pump(const Duration(milliseconds: 800));
-    await tester.pump(const Duration(milliseconds: 200));
+  Finder richTextPlain(String plainText) {
+    return find.byWidgetPredicate(
+      (widget) => widget is RichText && widget.text.toPlainText() == plainText,
+      description: 'RichText("$plainText")',
+    );
   }
 
   testWidgets('opens on the title screen before home', (tester) async {
@@ -78,16 +115,17 @@ void main() {
     expect(find.byType(TicTacToeTitleLogo), findsWidgets);
     expect(find.text(en.touchScreenPrompt), findsNothing);
 
-    await tester.pump(const Duration(milliseconds: 700));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 2));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 4));
+    await pumpAnimationSteps(tester, [
+      _titleRouteArrivalBuffer,
+      AppDurations.titleLogoEntranceDelay,
+      _titlePromptHiddenCheckLead,
+    ]);
     expect(find.text(en.touchScreenPrompt), findsNothing);
 
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 900));
+    await pumpAnimationSteps(tester, [
+      AppDurations.titlePromptDelay - _titlePromptHiddenCheckLead,
+      AppDurations.titlePrompt,
+    ]);
 
     expect(find.text(en.touchScreenPrompt), findsOneWidget);
   });
@@ -99,14 +137,15 @@ void main() {
     expect(find.byType(TicTacToeTitleLogo), findsWidgets);
     expect(find.text(en.localGameAction), findsOneWidget);
     expect(find.text(en.aiGameAction), findsOneWidget);
+    expect(find.text(en.continueRunAction), findsNothing);
     expect(find.text(en.scoreTitle), findsOneWidget);
 
     await tester.tap(find.text(en.settingsTitle));
     await tester.pumpAndSettle();
 
     expect(find.text(en.audioTitle), findsOneWidget);
+    expect(find.text(en.scoreTitle), findsOneWidget);
     expect(find.text(en.languageTitle), findsOneWidget);
-    expect(find.text(en.scoreTitle), findsNothing);
   });
 
   testWidgets('opens the score dialog from home', (tester) async {
@@ -117,7 +156,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text(en.recordTitle), findsOneWidget);
-    expect(find.text(en.humanScoreLabel), findsOneWidget);
+    expect(find.text(en.tarnishedRecordTitle), findsOneWidget);
     expect(find.text(en.resetScoreAction), findsOneWidget);
   });
 
@@ -140,7 +179,7 @@ void main() {
     await tester.tap(find.text(en.frenchLanguageLabel));
     await tester.pumpAndSettle();
 
-    expect(find.text(fr.languageTitle), findsOneWidget);
+    expect(find.text(fr.languageTitle), findsWidgets);
     expect(find.text(fr.systemHeaderTitle), findsOneWidget);
   });
 
@@ -152,12 +191,12 @@ void main() {
     await finishGameLoading(tester);
 
     expect(find.text(en.humanVsHumanLabel), findsNothing);
-    expect(find.text(en.humanTurnStatus), findsOneWidget);
-    expect(find.text(en.cpuTurnStatus), findsOneWidget);
+    expect(find.text(en.playerOneStatus), findsOneWidget);
+    expect(find.text(en.playerTwoStatus), findsOneWidget);
 
     final boardRect = tester.getRect(find.byType(GameBoard));
-    final humanLabelRect = tester.getRect(find.text(en.humanTurnStatus));
-    final cpuLabelRect = tester.getRect(find.text(en.cpuTurnStatus));
+    final humanLabelRect = tester.getRect(find.text(en.playerOneStatus));
+    final cpuLabelRect = tester.getRect(find.text(en.playerTwoStatus));
 
     expect(cpuLabelRect.bottom, lessThanOrEqualTo(boardRect.top));
     expect(humanLabelRect.top, greaterThanOrEqualTo(boardRect.bottom));
@@ -166,7 +205,7 @@ void main() {
       boardRect.topLeft + Offset(boardRect.width / 6, boardRect.height / 6),
     );
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(_boardMarkAssertBuffer);
 
     expect(find.image(const AssetImage(AppAssets.markX)), findsOneWidget);
 
@@ -174,7 +213,7 @@ void main() {
       boardRect.topLeft + Offset(boardRect.width / 6, boardRect.height / 6),
     );
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(_boardMarkAssertBuffer);
 
     expect(find.image(const AssetImage(AppAssets.markX)), findsOneWidget);
     expect(find.image(const AssetImage(AppAssets.markO)), findsNothing);
@@ -192,9 +231,8 @@ void main() {
             child: SizedBox.square(
               dimension: 300,
               child: GameBoard(
-                board: Board.empty(),
-                result: const GameResult.ongoing(),
-                mode: GameMode.humanVsCpu,
+                session: GameSession.newGame(GameSetup.guidedTrial()),
+                phase: GameViewPhase.awaitingHumanMove,
                 onCellPressed: pressedCells.add,
               ),
             ),
@@ -227,19 +265,21 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text(en.selectDifficultyTitle), findsOneWidget);
-    expect(find.text(en.easyLabel), findsOneWidget);
-    expect(find.text(en.hardLabel), findsOneWidget);
+    expect(find.text(en.guidedTrialAction), findsOneWidget);
+    expect(find.text(en.noMercyAction), findsOneWidget);
 
-    await tester.tap(find.text(en.hardLabel));
+    await tester.tap(find.text(en.noMercyAction));
     await finishGameLoading(tester);
 
     expect(find.text(en.humanVsCpuLabel), findsNothing);
     expect(find.text(en.humanTurnStatus), findsOneWidget);
-    expect(find.text(soloOpponentLabel), findsOneWidget);
+    expect(richTextPlain('Radahn\nStarscourge'), findsOneWidget);
 
-    final malenia = tester.widget<Image>(
-      find.image(const AssetImage(AppAssets.malenia)),
-    );
-    expect(malenia.opacity?.value, 1);
+    final radahnImages = find
+        .image(const AssetImage(AppAssets.radahn))
+        .evaluate()
+        .map((element) => element.widget)
+        .whereType<Image>();
+    expect(radahnImages.any((image) => image.opacity?.value == 1), isTrue);
   });
 }
