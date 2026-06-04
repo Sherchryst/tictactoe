@@ -9,23 +9,23 @@ import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
 import 'package:tictactoe/core/design_system/widgets/action_dialog.dart';
 import 'package:tictactoe/core/di/audio_providers.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
+import 'package:tictactoe/features/game/domain/entities/game_session.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
-import 'package:tictactoe/features/game/domain/entities/player.dart';
+import 'package:tictactoe/features/game/domain/entities/participant.dart';
+import 'package:tictactoe/features/game/presentation/utils/bosses/boss_presentation.dart';
 import 'package:tictactoe/features/game/presentation/utils/text/player_label_resolver.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
 
-enum GameOverChoice { playAgain, home }
+enum GameOverChoice { playAgain, home, nextBoss, newGamePlus, titleScreen }
 
 class GameOverDialog extends ConsumerWidget {
-  const GameOverDialog({required this.result, required this.mode, super.key});
+  const GameOverDialog({required this.session, super.key});
 
-  final GameResult result;
-  final GameMode mode;
+  final GameSession session;
 
   static Future<GameOverChoice?> show({
     required BuildContext context,
-    required GameResult result,
-    required GameMode mode,
+    required GameSession session,
   }) {
     final l10n = AppLocalizations.of(context);
 
@@ -33,7 +33,7 @@ class GameOverDialog extends ConsumerWidget {
       context: context,
       barrierLabel: l10n.gameOverTitle,
       barrierDismissible: false,
-      builder: (context) => GameOverDialog(result: result, mode: mode),
+      builder: (context) => GameOverDialog(session: session),
     );
   }
 
@@ -41,46 +41,86 @@ class GameOverDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final playerLabels = PlayerLabelResolver(l10n);
-    final message = switch (result) {
-      GameWin(:final winner) => playerLabels.win(winner, mode),
-      GameDraw() => l10n.drawDialogTitle,
-      GameOngoing() => l10n.gameTitle,
-    };
+    final message = playerLabels.result(session);
 
     return ActionDialog(
       title: l10n.gameOverTitle,
       message: message,
-      leadingArt: _ResultGlyph(result: result, mode: mode),
+      leadingArt: _ResultGlyph(session: session),
       onActionFeedback: () {
         unawaited(
           ref.read(audioControllerProvider).playMenuSfx(MenuSfx.select),
         );
       },
-      actions: [
+      actions: _actions(context, l10n),
+    );
+  }
+
+  List<ActionDialogButton> _actions(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
+    if (session.defeatedNoMercyFinalBoss) {
+      return [
+        ActionDialogButton(
+          label: l10n.newGamePlusAction,
+          prominent: true,
+          onPressed: () =>
+              Navigator.of(context).pop(GameOverChoice.newGamePlus),
+        ),
         ActionDialogButton(
           label: l10n.goHomeAction,
-          onPressed: () => Navigator.of(context).pop(GameOverChoice.home),
+          onPressed: () =>
+              Navigator.of(context).pop(GameOverChoice.titleScreen),
         ),
-        ActionDialogButton(
-          label: l10n.playAgainAction,
-          prominent: true,
-          onPressed: () => Navigator.of(context).pop(GameOverChoice.playAgain),
-        ),
-      ],
+      ];
+    }
+
+    final roundAction = _roundAction(context, l10n);
+
+    return [
+      ActionDialogButton(
+        label: l10n.goHomeAction,
+        onPressed: () => Navigator.of(context).pop(GameOverChoice.home),
+      ),
+      ?roundAction,
+    ];
+  }
+
+  ActionDialogButton? _roundAction(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
+    if (session.canAdvanceToNextNoMercyBoss) {
+      return ActionDialogButton(
+        label: l10n.nextBossAction,
+        prominent: true,
+        onPressed: () => Navigator.of(context).pop(GameOverChoice.nextBoss),
+      );
+    }
+
+    if (session.isNoMercy &&
+        session.participantOutcome == GameOutcome.humanWin) {
+      return null;
+    }
+
+    return ActionDialogButton(
+      label: l10n.playAgainAction,
+      prominent: true,
+      onPressed: () => Navigator.of(context).pop(GameOverChoice.playAgain),
     );
   }
 }
 
 class _ResultGlyph extends StatelessWidget {
-  const _ResultGlyph({required this.result, required this.mode});
+  const _ResultGlyph({required this.session});
 
-  final GameResult result;
-  final GameMode mode;
+  final GameSession session;
 
   @override
   Widget build(BuildContext context) {
-    final asset = _assetFor(result);
-    final tint = _tintFor(result, mode);
+    final asset = _assetFor(session);
+    final tint = _tintFor(session);
 
     return SizedBox.square(
       dimension: 64,
@@ -105,7 +145,7 @@ class _ResultGlyph extends StatelessWidget {
             height: 44,
             fit: BoxFit.contain,
             filterQuality: FilterQuality.high,
-            opacity: AlwaysStoppedAnimation(_iconOpacityFor(result, mode)),
+            opacity: AlwaysStoppedAnimation(_iconOpacityFor(session)),
             excludeFromSemantics: true,
           ),
         ],
@@ -113,31 +153,36 @@ class _ResultGlyph extends StatelessWidget {
     );
   }
 
-  String _assetFor(GameResult result) {
-    return switch (result) {
-      GameWin(:final winner) => switch (mode) {
-        GameMode.humanVsCpu when winner == Player.cpu => AppAssets.malenia,
-        _ => winner == Player.human ? AppAssets.flask : AppAssets.runeArc,
+  String _assetFor(GameSession session) {
+    return switch (session.result) {
+      GameWin(:final winner) => switch (session.participantFor(winner)) {
+        CpuParticipant(:final bossId) => bossId.presentation.aliveAsset,
+        HumanParticipant() when session.mode == GameMode.noMercyRun =>
+          session.bossId.presentation.deadAsset,
+        HumanParticipant(:final mark) =>
+          mark == session.humanMark ? AppAssets.flask : AppAssets.runeArc,
       },
       GameDraw() => AppAssets.statusRune,
       GameOngoing() => AppAssets.statusRune,
     };
   }
 
-  Color _tintFor(GameResult result, GameMode mode) {
-    return switch (result) {
-      GameWin(:final winner) =>
-        winner == Player.human || mode != GameMode.humanVsCpu
+  Color _tintFor(GameSession session) {
+    return switch (session.result) {
+      GameWin() =>
+        session.mode == GameMode.localDuel ||
+                session.participantOutcome == GameOutcome.humanWin
             ? AppPalette.goldBright
             : AppPalette.lossRed,
       _ => AppPalette.gold,
     };
   }
 
-  double _iconOpacityFor(GameResult result, GameMode mode) {
-    return switch (result) {
-      GameWin(:final winner)
-          when winner == Player.cpu && mode == GameMode.humanVsCpu =>
+  double _iconOpacityFor(GameSession session) {
+    return switch (session.result) {
+      GameWin()
+          when session.mode != GameMode.localDuel &&
+              session.participantOutcome == GameOutcome.cpuWin =>
         AppAlphas.medium,
       _ => AppAlphas.opaque,
     };
