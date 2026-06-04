@@ -1,17 +1,18 @@
-import 'package:tictactoe/features/settings/data/datasources/local_app_preferences_data_source.dart';
-import 'package:tictactoe/features/settings/data/models/app_preferences_dto.dart';
-import 'package:tictactoe/features/settings/domain/entities/app_preferences.dart';
-import 'package:tictactoe/features/settings/domain/repositories/app_preferences_repository.dart';
+import 'package:tictactoe/core/async/serial_task_queue.dart';
+import 'package:tictactoe/core/preferences/data/datasources/local_app_preferences_data_source.dart';
+import 'package:tictactoe/core/preferences/data/models/app_preferences_dto.dart';
+import 'package:tictactoe/core/preferences/domain/entities/app_preferences.dart';
+import 'package:tictactoe/core/preferences/domain/repositories/app_preferences_repository.dart';
 
 final class LocalAppPreferencesRepository implements AppPreferencesRepository {
   LocalAppPreferencesRepository(this._dataSource);
 
   final LocalAppPreferencesDataSource _dataSource;
-  Future<void> _mutationQueue = Future<void>.value();
+  final _mutationQueue = SerialTaskQueue();
 
   @override
   Future<AppPreferences> load() async {
-    await _mutationQueue;
+    await _mutationQueue.waitForIdle();
     return _loadNow();
   }
 
@@ -32,8 +33,6 @@ final class LocalAppPreferencesRepository implements AppPreferencesRepository {
   }
 
   Future<T> _enqueueMutation<T>(Future<T> Function() operation) {
-    final queued = _mutationQueue.then((_) => operation());
-    _mutationQueue = queued.then<void>((_) {}, onError: (_) {});
-    return queued;
+    return _mutationQueue.enqueue(operation);
   }
 }

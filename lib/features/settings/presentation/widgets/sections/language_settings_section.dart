@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'package:tictactoe/features/settings/domain/entities/app_preferences.dart';
+import 'package:tictactoe/core/preferences/domain/entities/app_preferences.dart';
 import 'package:tictactoe/features/settings/presentation/controllers/settings_controller.dart';
 import 'package:tictactoe/features/settings/presentation/controllers/settings_view_state.dart';
 import 'package:tictactoe/features/settings/presentation/widgets/system_rows.dart';

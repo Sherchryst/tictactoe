@@ -4,9 +4,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tictactoe/core/design_system/theme/app_palette.dart';
 import 'package:tictactoe/core/design_system/theme/app_theme.dart';
 import 'package:tictactoe/core/di/audio_providers.dart';
+import 'package:tictactoe/core/preferences/application/controllers/app_preferences_controller.dart';
+import 'package:tictactoe/core/preferences/presentation/app_locale_preference_mapper.dart';
 import 'package:tictactoe/core/router/app_router.dart';
-import 'package:tictactoe/features/settings/domain/entities/app_preferences.dart';
-import 'package:tictactoe/features/settings/presentation/controllers/settings_controller.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
 
 class TicTacToeApp extends ConsumerWidget {
@@ -26,16 +26,16 @@ class TicTacToeApp extends ConsumerWidget {
     ref.watch(audioPreferencesProvider);
 
     final router = ref.watch(appRouterProvider);
-    final settings = ref.watch(settingsControllerProvider);
+    final preferences = ref.watch(appPreferencesControllerProvider);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: _systemOverlay,
       child: MaterialApp.router(
-        title: 'Tic Tac Toe',
+        onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
         debugShowCheckedModeBanner: false,
         darkTheme: AppTheme.dark(),
-        locale: settings.when(
-          data: (state) => state.preferences.localePreference.locale,
+        locale: preferences.when(
+          data: (preferences) => preferences.localePreference.locale,
           error: (_, _) => const Locale('en'),
           loading: () => const Locale('en'),
         ),

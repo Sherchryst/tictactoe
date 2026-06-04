@@ -1,4 +1,4 @@
-import 'package:tictactoe/features/settings/domain/entities/app_preferences.dart';
+import 'package:tictactoe/core/preferences/domain/entities/app_preferences.dart';
 
 abstract interface class AppPreferencesRepository {
   Future<AppPreferences> load();

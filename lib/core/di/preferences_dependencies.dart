@@ -1,12 +1,12 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:tictactoe/core/di/storage_providers.dart';
-import 'package:tictactoe/features/settings/data/datasources/local_app_preferences_data_source.dart';
-import 'package:tictactoe/features/settings/data/repositories/local_app_preferences_repository.dart';
-import 'package:tictactoe/features/settings/domain/repositories/app_preferences_repository.dart';
-import 'package:tictactoe/features/settings/domain/usecases/load_preferences.dart';
-import 'package:tictactoe/features/settings/domain/usecases/save_preferences.dart';
+import 'package:tictactoe/core/preferences/application/usecases/load_preferences.dart';
+import 'package:tictactoe/core/preferences/application/usecases/save_preferences.dart';
+import 'package:tictactoe/core/preferences/data/datasources/local_app_preferences_data_source.dart';
+import 'package:tictactoe/core/preferences/data/repositories/local_app_preferences_repository.dart';
+import 'package:tictactoe/core/preferences/domain/repositories/app_preferences_repository.dart';
 
-part 'settings_dependencies.g.dart';
+part 'preferences_dependencies.g.dart';
 
 @Riverpod(keepAlive: true)
 LocalAppPreferencesDataSource localAppPreferencesDataSource(Ref ref) {

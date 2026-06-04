@@ -1,5 +1,5 @@
-import 'package:tictactoe/features/settings/domain/entities/app_preferences.dart';
-import 'package:tictactoe/features/settings/domain/repositories/app_preferences_repository.dart';
+import 'package:tictactoe/core/preferences/domain/entities/app_preferences.dart';
+import 'package:tictactoe/core/preferences/domain/repositories/app_preferences_repository.dart';
 
 final class SavePreferences {
   const SavePreferences(this._repository);
