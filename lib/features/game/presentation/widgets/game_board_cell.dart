@@ -1,16 +1,33 @@
-part of 'game_board.dart';
+import 'dart:async';
+import 'dart:math' as math;
 
-class _GameCell extends HookWidget {
-  const _GameCell({
-    required this.cell,
-    required this.mode,
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:tictactoe/core/design_system/theme/app_palette.dart';
+import 'package:tictactoe/core/design_system/tokens/app_alphas.dart';
+import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
+import 'package:tictactoe/core/design_system/tokens/app_curves.dart';
+import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
+import 'package:tictactoe/core/design_system/widgets/app_haptics.dart';
+import 'package:tictactoe/features/game/domain/entities/game_session.dart';
+import 'package:tictactoe/features/game/domain/entities/mark.dart';
+import 'package:tictactoe/features/game/domain/entities/participant.dart';
+import 'package:tictactoe/features/game/presentation/utils/bosses/boss_presentation.dart';
+import 'package:tictactoe/features/game/presentation/widgets/game_board_effects.dart';
+
+class GameBoardCell extends HookWidget {
+  const GameBoardCell({
+    required this.mark,
+    required this.session,
     required this.highlighted,
     required this.enabled,
     required this.onPressed,
+    super.key,
   });
 
-  final Cell cell;
-  final GameMode mode;
+  final Mark? mark;
+  final GameSession session;
   final bool highlighted;
   final bool enabled;
   final VoidCallback onPressed;
@@ -72,7 +89,7 @@ class _GameCell extends HookWidget {
                     child: const SizedBox.expand(),
                   ),
                 RepaintBoundary(
-                  child: _Mark(cell: cell, mode: mode),
+                  child: _Mark(mark: mark, session: session),
                 ),
               ],
             ),
@@ -105,26 +122,31 @@ class _MarkHalo extends StatelessWidget {
 }
 
 class _Mark extends StatelessWidget {
-  const _Mark({required this.cell, required this.mode});
+  const _Mark({required this.mark, required this.session});
 
-  final Cell cell;
-  final GameMode mode;
+  final Mark? mark;
+  final GameSession session;
 
   @override
   Widget build(BuildContext context) {
-    final asset = switch (cell) {
-      Cell.human => AppAssets.markX,
-      Cell.cpu =>
-        mode == GameMode.humanVsCpu ? AppAssets.malenia : AppAssets.markO,
-      Cell.empty => null,
-    };
+    final resolvedMark = mark;
 
-    if (asset == null) {
+    if (resolvedMark == null) {
       return const SizedBox.shrink();
     }
 
-    final isGold = cell == Cell.cpu;
-    final slashAngle = cell == Cell.human ? -math.pi / 12 : math.pi / 12;
+    final participant = session.participantFor(resolvedMark);
+    final asset = switch (participant) {
+      CpuParticipant(:final bossId) => bossId.presentation.aliveAsset,
+      HumanParticipant() when session.isNoMercy => AppAssets.runeArc,
+      HumanParticipant() =>
+        resolvedMark == Mark.x ? AppAssets.markX : AppAssets.markO,
+    };
+    final isGold =
+        session.isNoMercy ||
+        participant.kind == ParticipantKind.cpu ||
+        resolvedMark == Mark.o;
+    final slashAngle = resolvedMark == Mark.x ? -math.pi / 12 : math.pi / 12;
 
     return TweenAnimationBuilder<double>(
       key: ValueKey(asset),
@@ -153,12 +175,12 @@ class _Mark extends StatelessWidget {
             heightFactor: 0.92,
             child: _MarkHalo(),
           ),
-          const _ImpactFlash(),
-          _SlashEffect(isGold: isGold, angle: slashAngle),
-          _ParticleRing(isGold: isGold),
+          const GameBoardImpactFlash(),
+          GameBoardSlashEffect(isGold: isGold, angle: slashAngle),
+          GameBoardParticleRing(isGold: isGold),
           FractionallySizedBox(
-            widthFactor: cell == Cell.human ? 0.58 : 0.62,
-            heightFactor: cell == Cell.human ? 0.58 : 0.62,
+            widthFactor: asset == AppAssets.markX ? 0.58 : 0.62,
+            heightFactor: asset == AppAssets.markX ? 0.58 : 0.62,
             child: Image.asset(asset, fit: BoxFit.contain),
           ),
         ],

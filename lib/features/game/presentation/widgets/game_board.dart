@@ -1,46 +1,37 @@
-import 'dart:async';
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:tictactoe/core/design_system/theme/app_palette.dart';
 import 'package:tictactoe/core/design_system/tokens/app_alphas.dart';
-import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
-import 'package:tictactoe/core/design_system/tokens/app_curves.dart';
-import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
 import 'package:tictactoe/core/design_system/tokens/app_gradients.dart';
 import 'package:tictactoe/core/design_system/tokens/app_shadows.dart';
-import 'package:tictactoe/core/design_system/widgets/app_haptics.dart';
 import 'package:tictactoe/core/design_system/widgets/chrome_corner_flourish.dart';
 import 'package:tictactoe/core/design_system/widgets/sigil_backdrop.dart';
 import 'package:tictactoe/features/game/domain/entities/board.dart';
-import 'package:tictactoe/features/game/domain/entities/cell.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
-import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
-import 'package:tictactoe/features/game/domain/entities/player.dart';
-import 'package:tictactoe/features/game/presentation/utils/rendering/game_board_painters.dart';
-
-part 'game_board_cell.dart';
-part 'game_board_effects.dart';
+import 'package:tictactoe/features/game/domain/entities/game_session.dart';
+import 'package:tictactoe/features/game/presentation/controllers/game_view_state.dart';
+import 'package:tictactoe/features/game/presentation/utils/rendering/board_grid_painter.dart';
+import 'package:tictactoe/features/game/presentation/widgets/game_board_cell.dart';
+import 'package:tictactoe/features/game/presentation/widgets/game_board_effects.dart'
+    as board_effects;
 
 class GameBoard extends HookWidget {
   const GameBoard({
-    required this.board,
-    required this.result,
+    required this.session,
+    required this.phase,
     required this.onCellPressed,
-    required this.mode,
     super.key,
   });
 
-  final Board board;
-  final GameResult result;
+  final GameSession session;
+  final GameViewPhase phase;
   final ValueChanged<int> onCellPressed;
-  final GameMode mode;
 
   @override
   Widget build(BuildContext context) {
     final tapLocked = useRef(false);
+    final board = session.board;
+    final result = session.result;
     final winningCells = switch (result) {
       GameWin(:final winningCells) => winningCells,
       _ => const <int>[],
@@ -65,7 +56,7 @@ class GameBoard extends HookWidget {
     }
 
     return RepaintBoundary(
-      child: _DrawShake(
+      child: board_effects.GameBoardDrawShake(
         enabled: result is GameDraw,
         child: AspectRatio(
           aspectRatio: 1,
@@ -116,18 +107,25 @@ class GameBoard extends HookWidget {
                     itemBuilder: (context, index) {
                       final canPlace = board.canPlace(index);
 
-                      return _GameCell(
-                        cell: board.cellAt(index),
-                        mode: mode,
+                      return GameBoardCell(
+                        mark: board.markAt(index),
+                        session: session,
                         highlighted: winningCells.contains(index),
-                        enabled: result.isOngoing && canPlace,
+                        enabled:
+                            phase == GameViewPhase.awaitingHumanMove &&
+                            session.canHumanPlay &&
+                            canPlace,
                         onPressed: () => handleCellPressed(index),
                       );
                     },
                   ),
                   if (winningCells.isNotEmpty && winWinner != null)
-                    _WinningBeam(winningCells: winningCells, winner: winWinner),
-                  if (result is GameDraw) const _DrawFog(),
+                    board_effects.GameBoardWinningBeam(
+                      winningCells: winningCells,
+                      winner: winWinner,
+                    ),
+                  if (result is GameDraw)
+                    const board_effects.GameBoardDrawFog(),
                 ],
               ),
             ),

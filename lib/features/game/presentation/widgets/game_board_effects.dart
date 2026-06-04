@@ -1,7 +1,15 @@
-part of 'game_board.dart';
+import 'dart:async';
 
-class _ImpactFlash extends StatelessWidget {
-  const _ImpactFlash();
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:tictactoe/core/design_system/tokens/app_curves.dart';
+import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
+import 'package:tictactoe/features/game/domain/entities/mark.dart';
+import 'package:tictactoe/features/game/presentation/utils/rendering/board_effect_painters.dart';
+import 'package:tictactoe/features/game/presentation/utils/rendering/winning_beam_painter.dart';
+
+class GameBoardImpactFlash extends StatelessWidget {
+  const GameBoardImpactFlash({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +39,12 @@ class _ImpactFlash extends StatelessWidget {
   }
 }
 
-class _SlashEffect extends StatelessWidget {
-  const _SlashEffect({required this.isGold, required this.angle});
+class GameBoardSlashEffect extends StatelessWidget {
+  const GameBoardSlashEffect({
+    required this.isGold,
+    required this.angle,
+    super.key,
+  });
 
   final bool isGold;
   final double angle;
@@ -73,8 +85,8 @@ class _SlashEffect extends StatelessWidget {
   }
 }
 
-class _ParticleRing extends StatelessWidget {
-  const _ParticleRing({required this.isGold});
+class GameBoardParticleRing extends StatelessWidget {
+  const GameBoardParticleRing({required this.isGold, super.key});
 
   final bool isGold;
 
@@ -105,11 +117,15 @@ class _ParticleRing extends StatelessWidget {
   }
 }
 
-class _WinningBeam extends StatelessWidget {
-  const _WinningBeam({required this.winningCells, required this.winner});
+class GameBoardWinningBeam extends StatelessWidget {
+  const GameBoardWinningBeam({
+    required this.winningCells,
+    required this.winner,
+    super.key,
+  });
 
   final List<int> winningCells;
-  final Player winner;
+  final Mark winner;
 
   @override
   Widget build(BuildContext context) {
@@ -145,8 +161,8 @@ class _WinningBeam extends StatelessWidget {
   }
 }
 
-class _DrawFog extends StatelessWidget {
-  const _DrawFog();
+class GameBoardDrawFog extends StatelessWidget {
+  const GameBoardDrawFog({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -178,8 +194,12 @@ class _DrawFog extends StatelessWidget {
   }
 }
 
-class _DrawShake extends HookWidget {
-  const _DrawShake({required this.enabled, required this.child});
+class GameBoardDrawShake extends HookWidget {
+  const GameBoardDrawShake({
+    required this.enabled,
+    required this.child,
+    super.key,
+  });
 
   final bool enabled;
   final Widget child;
