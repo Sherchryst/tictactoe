@@ -1,8 +1,5 @@
 import 'package:tictactoe/features/game/domain/entities/board.dart';
-import 'package:tictactoe/features/game/domain/entities/cell.dart';
-import 'package:tictactoe/features/game/domain/entities/game_domain_messages.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
-import 'package:tictactoe/features/game/domain/entities/player.dart';
 
 final class GameRules {
   const GameRules();
@@ -20,17 +17,14 @@ final class GameRules {
 
   GameResult evaluate(Board board) {
     for (final line in winningLines) {
-      final firstCell = board.cellAt(line.first);
-      if (firstCell.isEmpty) {
+      final firstMark = board.markAt(line.first);
+      if (firstMark == null) {
         continue;
       }
 
-      final hasLine = line.every((index) => board.cellAt(index) == firstCell);
+      final hasLine = line.every((index) => board.markAt(index) == firstMark);
       if (hasLine) {
-        return GameResult.win(
-          winner: _playerFor(firstCell),
-          winningCells: line,
-        );
+        return GameResult.win(winner: firstMark, winningCells: line);
       }
     }
 
@@ -39,15 +33,5 @@ final class GameRules {
     }
 
     return const GameResult.ongoing();
-  }
-
-  Player _playerFor(Cell cell) {
-    return switch (cell) {
-      Cell.human => Player.human,
-      Cell.cpu => Player.cpu,
-      Cell.empty => throw ArgumentError(
-        GameDomainMessages.emptyCellHasNoPlayer,
-      ),
-    };
   }
 }

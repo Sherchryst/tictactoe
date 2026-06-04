@@ -1,8 +1,8 @@
-import 'package:tictactoe/features/game/domain/entities/cell.dart';
 import 'package:tictactoe/features/game/domain/entities/game_domain_messages.dart';
+import 'package:tictactoe/features/game/domain/entities/mark.dart';
 
 final class Board {
-  factory Board({required List<Cell> cells}) {
+  factory Board({required List<Mark?> cells}) {
     if (cells.length != cellCount) {
       throw ArgumentError.value(
         cells.length,
@@ -11,57 +11,47 @@ final class Board {
       );
     }
 
-    return Board._(List<Cell>.unmodifiable(cells));
+    return Board._(List<Mark?>.unmodifiable(cells));
   }
 
   const Board._(this.cells);
 
   factory Board.empty() {
     return Board(
-      cells: const [
-        Cell.empty,
-        Cell.empty,
-        Cell.empty,
-        Cell.empty,
-        Cell.empty,
-        Cell.empty,
-        Cell.empty,
-        Cell.empty,
-        Cell.empty,
-      ],
+      cells: const [null, null, null, null, null, null, null, null, null],
     );
   }
 
   static const size = 3;
   static const cellCount = size * size;
 
-  final List<Cell> cells;
+  final List<Mark?> cells;
 
-  bool get isFull => !cells.contains(Cell.empty);
+  bool get isFull => !cells.contains(null);
 
   List<int> get emptyCells {
     return [
       for (var index = 0; index < cells.length; index++)
-        if (cells[index].isEmpty) index,
+        if (cells[index] == null) index,
     ];
   }
 
   bool canPlace(int index) {
-    return index >= 0 && index < cells.length && cells[index].isEmpty;
+    return index >= 0 && index < cells.length && cells[index] == null;
   }
 
-  Cell cellAt(int index) {
+  Mark? markAt(int index) {
     RangeError.checkValidIndex(index, cells, 'index', cellCount);
     return cells[index];
   }
 
-  Board place(Cell cell, int index) {
+  Board place(Mark mark, int index) {
     if (!canPlace(index)) {
       throw StateError(GameDomainMessages.cellNotPlayable(index));
     }
 
-    final nextCells = List<Cell>.of(cells);
-    nextCells[index] = cell;
+    final nextCells = List<Mark?>.of(cells);
+    nextCells[index] = mark;
     return Board(cells: nextCells);
   }
 
@@ -77,7 +67,7 @@ final class Board {
   @override
   String toString() => 'Board(cells: $cells)';
 
-  static bool _sameCells(List<Cell> first, List<Cell> second) {
+  static bool _sameCells(List<Mark?> first, List<Mark?> second) {
     if (first.length != second.length) {
       return false;
     }

@@ -1,7 +1,8 @@
 import 'package:tictactoe/features/game/domain/entities/board.dart';
 import 'package:tictactoe/features/game/domain/entities/game_domain_messages.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
-import 'package:tictactoe/features/game/domain/entities/player.dart';
+import 'package:tictactoe/features/game/domain/entities/game_session.dart';
+import 'package:tictactoe/features/game/domain/entities/mark.dart';
 import 'package:tictactoe/features/game/domain/services/cpu_strategy.dart';
 import 'package:tictactoe/features/game/domain/services/game_rules.dart';
 
@@ -14,7 +15,11 @@ final class MinimaxCpuStrategy implements CpuStrategy {
   final GameRules _rules;
 
   @override
-  int chooseMove(Board board, Player player) {
+  int chooseMove(GameSession session) {
+    return chooseMoveFor(session.board, session.cpuMark);
+  }
+
+  int chooseMoveFor(Board board, Mark mark) {
     final availableCells = _orderedEmptyCells(board);
     if (availableCells.isEmpty) {
       throw StateError(GameDomainMessages.noMoveAvailable);
@@ -25,9 +30,9 @@ final class MinimaxCpuStrategy implements CpuStrategy {
 
     for (final index in availableCells) {
       final score = _minimax(
-        board.place(player.cell, index),
-        currentPlayer: player.opponent,
-        maximizingPlayer: player,
+        board.place(mark, index),
+        currentMark: mark.opponent,
+        maximizingMark: mark,
         depth: 1,
       );
 
@@ -42,14 +47,14 @@ final class MinimaxCpuStrategy implements CpuStrategy {
 
   int _minimax(
     Board board, {
-    required Player currentPlayer,
-    required Player maximizingPlayer,
+    required Mark currentMark,
+    required Mark maximizingMark,
     required int depth,
   }) {
     final result = _rules.evaluate(board);
     switch (result) {
       case GameWin(:final winner):
-        return winner == maximizingPlayer ? 10 - depth : depth - 10;
+        return winner == maximizingMark ? 10 - depth : depth - 10;
       case GameDraw():
         return 0;
       case GameOngoing():
@@ -59,14 +64,14 @@ final class MinimaxCpuStrategy implements CpuStrategy {
     final scores = [
       for (final index in _orderedEmptyCells(board))
         _minimax(
-          board.place(currentPlayer.cell, index),
-          currentPlayer: currentPlayer.opponent,
-          maximizingPlayer: maximizingPlayer,
+          board.place(currentMark, index),
+          currentMark: currentMark.opponent,
+          maximizingMark: maximizingMark,
           depth: depth + 1,
         ),
     ];
 
-    return currentPlayer == maximizingPlayer
+    return currentMark == maximizingMark
         ? scores.reduce((value, score) => value > score ? value : score)
         : scores.reduce((value, score) => value < score ? value : score);
   }

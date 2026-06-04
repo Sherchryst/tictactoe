@@ -1,0 +1,10 @@
+import 'package:tictactoe/features/game/domain/entities/game_session.dart';
+import 'package:tictactoe/features/game/domain/repositories/no_mercy_run_repository.dart';
+
+final class SaveNoMercyRun {
+  const SaveNoMercyRun(this._repository);
+
+  final NoMercyRunRepository _repository;
+
+  Future<void> call(GameSession session) => _repository.save(session);
+}

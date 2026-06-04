@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'package:tictactoe/features/game/domain/entities/player.dart';
+import 'package:tictactoe/features/game/domain/entities/mark.dart';
 
 part 'game_result.freezed.dart';
 
@@ -13,20 +13,11 @@ sealed class GameResult with _$GameResult {
   const factory GameResult.ongoing() = GameOngoing;
 
   const factory GameResult.win({
-    required Player winner,
+    required Mark winner,
     required List<int> winningCells,
   }) = GameWin;
 
   const factory GameResult.draw() = GameDraw;
 
   bool get isOngoing => this is GameOngoing;
-
-  GameOutcome? get outcome {
-    return switch (this) {
-      GameWin(:final winner) =>
-        winner == Player.human ? GameOutcome.humanWin : GameOutcome.cpuWin,
-      GameDraw() => GameOutcome.draw,
-      GameOngoing() => null,
-    };
-  }
 }

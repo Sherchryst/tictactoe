@@ -1,8 +1,7 @@
 import 'dart:math';
 
-import 'package:tictactoe/features/game/domain/entities/board.dart';
 import 'package:tictactoe/features/game/domain/entities/game_domain_messages.dart';
-import 'package:tictactoe/features/game/domain/entities/player.dart';
+import 'package:tictactoe/features/game/domain/entities/game_session.dart';
 import 'package:tictactoe/features/game/domain/services/cpu_strategy.dart';
 
 final class RandomCpuStrategy implements CpuStrategy {
@@ -11,8 +10,8 @@ final class RandomCpuStrategy implements CpuStrategy {
   final Random _random;
 
   @override
-  int chooseMove(Board board, Player player) {
-    final emptyCells = board.emptyCells;
+  int chooseMove(GameSession session) {
+    final emptyCells = session.board.emptyCells;
     if (emptyCells.isEmpty) {
       throw StateError(GameDomainMessages.noMoveAvailable);
     }

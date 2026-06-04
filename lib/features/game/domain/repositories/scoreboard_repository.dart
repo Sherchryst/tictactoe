@@ -1,3 +1,4 @@
+import 'package:tictactoe/features/game/domain/entities/cpu_boss.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/scoreboard.dart';
 
@@ -6,7 +7,7 @@ abstract interface class ScoreboardRepository {
 
   Future<void> save(Scoreboard scoreboard);
 
-  Future<Scoreboard> record(GameOutcome outcome);
+  Future<Scoreboard> record(CpuBossId bossId, GameOutcome outcome);
 
   Future<void> reset();
 }

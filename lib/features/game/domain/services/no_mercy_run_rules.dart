@@ -1,0 +1,1 @@
+const maxNoMercyCycle = 4;

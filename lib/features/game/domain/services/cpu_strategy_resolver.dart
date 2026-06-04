@@ -1,20 +1,23 @@
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
+import 'package:tictactoe/features/game/domain/services/boss_puzzle_cpu_strategy.dart';
 import 'package:tictactoe/features/game/domain/services/cpu_strategy.dart';
-import 'package:tictactoe/features/game/domain/services/minimax_cpu_strategy.dart';
 import 'package:tictactoe/features/game/domain/services/random_cpu_strategy.dart';
 
 final class CpuStrategyResolver {
-  CpuStrategyResolver({CpuStrategy? easyStrategy, CpuStrategy? hardStrategy})
-    : _easyStrategy = easyStrategy ?? RandomCpuStrategy(),
-      _hardStrategy = hardStrategy ?? const MinimaxCpuStrategy();
+  CpuStrategyResolver({
+    CpuStrategy? guidedStrategy,
+    CpuStrategy? noMercyStrategy,
+  }) : _guidedStrategy = guidedStrategy ?? RandomCpuStrategy(),
+       _noMercyStrategy = noMercyStrategy ?? const BossPuzzleCpuStrategy();
 
-  final CpuStrategy _easyStrategy;
-  final CpuStrategy _hardStrategy;
+  final CpuStrategy _guidedStrategy;
+  final CpuStrategy _noMercyStrategy;
 
-  CpuStrategy resolve(GameDifficulty difficulty) {
-    return switch (difficulty) {
-      GameDifficulty.easy => _easyStrategy,
-      GameDifficulty.hard => _hardStrategy,
+  CpuStrategy resolve(GameMode mode) {
+    return switch (mode) {
+      GameMode.localDuel => _guidedStrategy,
+      GameMode.guidedTrial => _guidedStrategy,
+      GameMode.noMercyRun => _noMercyStrategy,
     };
   }
 }

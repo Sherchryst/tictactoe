@@ -1,6 +1,5 @@
 import 'package:tictactoe/features/game/domain/entities/game_session.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
-import 'package:tictactoe/features/game/domain/entities/player.dart';
 import 'package:tictactoe/features/game/domain/services/cpu_strategy_resolver.dart';
 import 'package:tictactoe/features/game/domain/usecases/play_move.dart';
 
@@ -15,15 +14,20 @@ final class PlayCpuTurn {
   final CpuStrategyResolver _strategyResolver;
 
   GameSession call(GameSession session) {
-    if (session.mode != GameMode.humanVsCpu ||
+    if (session.mode == GameMode.localDuel ||
         !session.result.isOngoing ||
-        session.currentPlayer != Player.cpu) {
+        session.currentMark != session.cpuMark) {
       return session;
     }
 
-    final strategy = _strategyResolver.resolve(session.difficulty);
-    final cellIndex = strategy.chooseMove(session.board, Player.cpu);
+    final strategy = _strategyResolver.resolve(session.mode);
+    final cellIndex = strategy.chooseMove(session);
 
-    return _playMove(session, Player.cpu, cellIndex);
+    final afterCpu = _playMove(session, session.cpuMark, cellIndex);
+    if (afterCpu == session) {
+      return session;
+    }
+
+    return afterCpu.copyWith(cpuMoves: [...session.cpuMoves, cellIndex]);
   }
 }

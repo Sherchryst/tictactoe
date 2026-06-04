@@ -1,3 +1,4 @@
+import 'package:tictactoe/features/game/domain/entities/cpu_boss.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/scoreboard.dart';
 import 'package:tictactoe/features/game/domain/repositories/scoreboard_repository.dart';
@@ -7,7 +8,7 @@ final class RecordGameOutcome {
 
   final ScoreboardRepository _repository;
 
-  Future<Scoreboard> call(GameOutcome outcome) {
-    return _repository.record(outcome);
+  Future<Scoreboard> call(CpuBossId bossId, GameOutcome outcome) {
+    return _repository.record(bossId, outcome);
   }
 }

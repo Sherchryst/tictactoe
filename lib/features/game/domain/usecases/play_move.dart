@@ -1,6 +1,6 @@
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/game_session.dart';
-import 'package:tictactoe/features/game/domain/entities/player.dart';
+import 'package:tictactoe/features/game/domain/entities/mark.dart';
 import 'package:tictactoe/features/game/domain/services/game_rules.dart';
 
 final class PlayMove {
@@ -8,19 +8,19 @@ final class PlayMove {
 
   final GameRules _rules;
 
-  GameSession call(GameSession session, Player player, int cellIndex) {
+  GameSession call(GameSession session, Mark mark, int cellIndex) {
     if (!session.result.isOngoing ||
-        player != session.currentPlayer ||
+        mark != session.currentMark ||
         !session.board.canPlace(cellIndex)) {
       return session;
     }
 
-    final board = session.board.place(player.cell, cellIndex);
+    final board = session.board.place(mark, cellIndex);
     final result = _rules.evaluate(board);
 
     return session.copyWith(
       board: board,
-      currentPlayer: result is GameOngoing ? player.opponent : player,
+      currentMark: result is GameOngoing ? mark.opponent : mark,
       result: result,
     );
   }
