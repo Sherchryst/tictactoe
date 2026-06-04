@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tictactoe/core/design_system/theme/app_theme.dart';
+import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
 import 'package:tictactoe/core/di/audio_providers.dart';
 import 'package:tictactoe/core/di/storage_providers.dart';
 import 'package:tictactoe/core/router/app_routes.dart';
@@ -200,8 +201,10 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.text(en.nextBossAction));
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pumpAndSettle();
+    await tester.pump(AppDurations.buttonActivation);
+    await tester.pump(AppDurations.dialogTransition);
+    await tester.pump(AppDurations.routeLoading);
+    await tester.pump();
     await sequence;
 
     final preparedSession = container.read(gameControllerProvider).session;

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:mockito/mockito.dart';
 import 'package:tictactoe/app.dart';
 import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
 import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
 import 'package:tictactoe/core/design_system/widgets/tic_tac_toe_title_logo.dart';
 import 'package:tictactoe/core/di/audio_providers.dart';
 import 'package:tictactoe/core/di/storage_providers.dart';
+import 'package:tictactoe/core/router/app_router.dart';
 import 'package:tictactoe/features/game/domain/entities/game_session.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/presentation/controllers/game_view_state.dart';
@@ -60,6 +63,33 @@ void main() {
       ),
     );
     await tester.pump();
+  }
+
+  Future<MockAudioController> pumpAppWithAudio(WidgetTester tester) async {
+    final audio = MockAudioController();
+    stubAudioController(audio);
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => const SizedBox.shrink(),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appRouterProvider.overrideWithValue(router),
+          audioControllerProvider.overrideWithValue(audio),
+          keyValueStorageProvider.overrideWithValue(InMemoryKeyValueStorage()),
+        ],
+        child: const TicTacToeApp(),
+      ),
+    );
+    await tester.pump();
+    return audio;
   }
 
   Future<void> finishSplash(WidgetTester tester) async {
@@ -128,6 +158,35 @@ void main() {
     ]);
 
     expect(find.text(en.touchScreenPrompt), findsOneWidget);
+  });
+
+  testWidgets('pauses music when the app leaves the foreground', (
+    tester,
+  ) async {
+    final audio = await pumpAppWithAudio(tester);
+    clearInteractions(audio);
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    await tester.pump();
+
+    verify(audio.pauseMusic()).called(1);
+
+    clearInteractions(audio);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    await tester.pump();
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.pump();
+
+    verifyNever(audio.pauseMusic());
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+    clearInteractions(audio);
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.pump();
+
+    verify(audio.pauseMusic()).called(1);
   });
 
   testWidgets('shows the home actions and opens preferences', (tester) async {

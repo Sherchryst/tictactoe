@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
 import 'package:tictactoe/core/di/audio_providers.dart';
 import 'package:tictactoe/core/router/app_routes.dart';
 import 'package:tictactoe/features/game/domain/entities/game_session.dart';
@@ -72,12 +73,10 @@ Future<void> _advanceNoMercyThenShowLoading(
   unawaited(ref.read(audioControllerProvider).playRestart());
   final gameController = ref.read(gameControllerProvider.notifier);
 
-  final advanced = await gameController.advanceNoMercyRun();
-  if (!context.mounted) {
-    return;
-  }
-
-  context.go(advanced ? AppRoutes.gameLoadingLocation : AppRoutes.homeLocation);
+  await _showLoadingThenPrepare(
+    context,
+    prepare: gameController.advanceNoMercyRun,
+  );
 }
 
 Future<void> _startNewGamePlusThenShowLoading(
@@ -89,18 +88,38 @@ Future<void> _startNewGamePlusThenShowLoading(
   final gameController = ref.read(gameControllerProvider.notifier);
 
   if (session.completedMaxNoMercyCycle) {
-    await gameController.restartNoMercyRun();
-    if (context.mounted) {
-      context.go(AppRoutes.gameLoadingLocation);
-    }
-
+    await _showLoadingThenPrepare(
+      context,
+      prepare: () async {
+        await gameController.restartNoMercyRun();
+        return true;
+      },
+    );
     return;
   }
 
-  final advanced = await gameController.advanceNoMercyRun();
   if (!context.mounted) {
     return;
   }
 
-  context.go(advanced ? AppRoutes.gameLoadingLocation : AppRoutes.homeLocation);
+  await _showLoadingThenPrepare(
+    context,
+    prepare: gameController.advanceNoMercyRun,
+  );
+}
+
+Future<void> _showLoadingThenPrepare(
+  BuildContext context, {
+  required Future<bool> Function() prepare,
+}) async {
+  final router = GoRouter.of(context);
+  router.go(AppRoutes.gameLoadingLocation);
+
+  await WidgetsBinding.instance.endOfFrame;
+  await Future<void>.delayed(AppDurations.routeLoading);
+
+  final prepared = await prepare();
+  if (!prepared) {
+    router.go(AppRoutes.homeLocation);
+  }
 }
