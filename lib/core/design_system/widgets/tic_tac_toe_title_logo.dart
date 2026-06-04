@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:tictactoe/core/design_system/theme/app_palette.dart';
 
 class TicTacToeTitleLogo extends StatelessWidget {
-  const TicTacToeTitleLogo({this.fontSize, this.opacity = 1, super.key});
+  const TicTacToeTitleLogo({
+    required this.title,
+    this.fontSize,
+    this.opacity = 1,
+    super.key,
+  });
 
+  final String title;
   final double? fontSize;
   final double opacity;
-
-  static const title = 'Tic Tac Toe';
 
   @override
   Widget build(BuildContext context) {
@@ -22,14 +26,14 @@ class TicTacToeTitleLogo extends StatelessWidget {
             ? constraints.maxWidth
             : fallbackWidth.clamp(0, double.infinity).toDouble();
         final fittedFontSize = _fitFontSize(
-          text: TicTacToeTitleLogo.title,
+          text: title,
           maxWidth: width,
           fontSize: resolvedFontSize,
         );
         final height = fittedFontSize * 1.36;
 
         return Semantics(
-          label: TicTacToeTitleLogo.title,
+          label: title,
           child: Opacity(
             opacity: opacity,
             child: RepaintBoundary(
@@ -38,7 +42,10 @@ class TicTacToeTitleLogo extends StatelessWidget {
                 height: height,
                 child: ClipRect(
                   child: CustomPaint(
-                    painter: _TitleLogoPainter(fontSize: fittedFontSize),
+                    painter: _TitleLogoPainter(
+                      title: title,
+                      fontSize: fittedFontSize,
+                    ),
                   ),
                 ),
               ),
@@ -78,8 +85,9 @@ class TicTacToeTitleLogo extends StatelessWidget {
 }
 
 class _TitleLogoPainter extends CustomPainter {
-  const _TitleLogoPainter({required this.fontSize});
+  const _TitleLogoPainter({required this.title, required this.fontSize});
 
+  final String title;
   final double fontSize;
 
   @override
@@ -135,7 +143,7 @@ class _TitleLogoPainter extends CustomPainter {
   TextPainter _textPainter({Paint? foreground}) {
     return TextPainter(
       text: TextSpan(
-        text: TicTacToeTitleLogo.title,
+        text: title,
         style: _textStyle(fontSize: fontSize, foreground: foreground),
       ),
       maxLines: 1,
@@ -147,7 +155,7 @@ class _TitleLogoPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_TitleLogoPainter oldDelegate) {
-    return oldDelegate.fontSize != fontSize;
+    return oldDelegate.title != title || oldDelegate.fontSize != fontSize;
   }
 }
 

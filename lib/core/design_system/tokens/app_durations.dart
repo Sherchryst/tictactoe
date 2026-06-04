@@ -10,7 +10,7 @@ final class AppDurations {
 
   static const Duration menuActionHold = Duration(milliseconds: 260);
   static const Duration buttonActivation = Duration(milliseconds: 230);
-  static const Duration loadingScreen = Duration(seconds: 5);
+  static const Duration loadingScreen = Duration(milliseconds: 3600);
   static const Duration splashScreen = Duration(milliseconds: 2350);
 
   static const Duration routeTitle = Duration(milliseconds: 820);

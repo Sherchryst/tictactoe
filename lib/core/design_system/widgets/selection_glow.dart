@@ -117,40 +117,92 @@ class _SelectionShinePainter extends CustomPainter {
     final center = size.center(Offset.zero);
     final scaledIntensity = intensity.clamp(0.0, 1.4);
     final lineWidth = size.width * 0.92 * clampedReveal;
-    final shineCurve = AppCurves.standard.transform(shineProgress);
-    final fade = math.sin(shineProgress * math.pi).clamp(0.0, 1.0);
-    final distance = lineWidth * 0.5 * shineCurve;
-    final glintLength = size.width * 0.055;
-    final glint = Paint()
-      ..color = AppPalette.ivoryText.withValues(
-        alpha: (0.9 * lineOpacity * fade * scaledIntensity).clamp(0.0, 1.0),
-      )
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = math.max(1.8, size.height * 0.11)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.2);
+    final pulse = 0.72 + math.sin(shineProgress * math.pi) * 0.28;
+    final alpha = (lineOpacity * scaledIntensity * pulse).clamp(0.0, 1.0);
 
-    final core = Paint()
-      ..color = AppPalette.goldBright.withValues(
-        alpha: (0.28 * (1 - shineCurve) * scaledIntensity).clamp(0.0, 1.0),
-      )
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = math.max(1.4, size.height * 0.08)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
-
-    canvas.drawLine(
-      Offset(center.dx - lineWidth * 0.32, center.dy),
-      Offset(center.dx + lineWidth * 0.32, center.dy),
-      core,
+    _drawGlowBand(
+      canvas,
+      center: center,
+      width: lineWidth,
+      height: math.max(18, size.height * 0.9),
+      color: AppPalette.gold,
+      alpha: 0.18 * alpha,
+      blur: math.max(5, size.height * 0.24),
     );
+    _drawGlowBand(
+      canvas,
+      center: center,
+      width: lineWidth * 0.96,
+      height: math.max(14, size.height * 0.68),
+      color: AppPalette.goldBright,
+      alpha: 0.30 * alpha,
+      blur: math.max(3, size.height * 0.14),
+    );
+    _drawGlowBand(
+      canvas,
+      center: center,
+      width: lineWidth * 0.88,
+      height: math.max(10, size.height * 0.46),
+      color: AppPalette.ivoryText,
+      alpha: 0.16 * alpha,
+      blur: math.max(1.5, size.height * 0.06),
+    );
+  }
 
-    for (final direction in const [-1, 1]) {
-      final dx = center.dx + distance * direction;
-      canvas.drawLine(
-        Offset(dx - glintLength * direction, center.dy),
-        Offset(dx + glintLength * direction, center.dy),
-        glint,
-      );
-    }
+  void _drawGlowBand(
+    Canvas canvas, {
+    required Offset center,
+    required double width,
+    required double height,
+    required Color color,
+    required double alpha,
+    required double blur,
+  }) {
+    final rect = Rect.fromCenter(center: center, width: width, height: height);
+    final band = _lensPath(rect);
+    final paint = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          color.withValues(alpha: 0),
+          color.withValues(alpha: alpha * 0.66),
+          color.withValues(alpha: alpha),
+          color.withValues(alpha: alpha * 0.66),
+          color.withValues(alpha: 0),
+        ],
+        stops: const [0, 0.18, 0.5, 0.82, 1],
+      ).createShader(rect)
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
+
+    canvas.drawPath(band, paint);
+  }
+
+  Path _lensPath(Rect rect) {
+    final center = rect.center;
+    final left = rect.left;
+    final right = rect.right;
+    final top = rect.top;
+    final bottom = rect.bottom;
+    final controlInset = rect.width * 0.22;
+
+    return Path()
+      ..moveTo(left, center.dy)
+      ..cubicTo(
+        left + controlInset,
+        top,
+        right - controlInset,
+        top,
+        right,
+        center.dy,
+      )
+      ..cubicTo(
+        right - controlInset,
+        bottom,
+        left + controlInset,
+        bottom,
+        left,
+        center.dy,
+      )
+      ..close();
   }
 
   @override

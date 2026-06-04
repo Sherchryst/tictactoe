@@ -1,19 +1,22 @@
 <svg width="960" height="120" viewBox="0 0 960 120" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <radialGradient id="haze" cx="50%" cy="50%" r="56%">
-      <stop offset="0%" stop-color="#E3C16B" stop-opacity="0.75"/>
-      <stop offset="36%" stop-color="#C19D53" stop-opacity="0.28"/>
+    <radialGradient id="haze" cx="50%" cy="50%" r="58%">
+      <stop offset="0%" stop-color="#E3C16B" stop-opacity="0.68"/>
+      <stop offset="38%" stop-color="#C19D53" stop-opacity="0.30"/>
       <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="line" x1="0" y1="0" x2="960" y2="0" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#F4D98A" stop-opacity="0"/>
-      <stop offset="13%" stop-color="#C19D53" stop-opacity="0.22"/>
+      <stop offset="8%" stop-color="#C19D53" stop-opacity="0.32"/>
+      <stop offset="22%" stop-color="#F4D98A" stop-opacity="0.56"/>
       <stop offset="50%" stop-color="#F4D98A" stop-opacity="0.72"/>
-      <stop offset="87%" stop-color="#C19D53" stop-opacity="0.22"/>
+      <stop offset="78%" stop-color="#F4D98A" stop-opacity="0.56"/>
+      <stop offset="92%" stop-color="#C19D53" stop-opacity="0.32"/>
       <stop offset="100%" stop-color="#F4D98A" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <ellipse cx="480" cy="60" rx="480" ry="36" fill="url(#haze)"/>
-  <rect x="0" y="57" width="960" height="4" fill="url(#line)" opacity="0.7"/>
-  <rect x="0" y="52" width="960" height="14" fill="url(#line)" opacity="0.22"/>
+  <ellipse cx="480" cy="60" rx="480" ry="56" fill="url(#haze)" opacity="0.72"/>
+  <path d="M0 60 C160 8 800 8 960 60 C800 112 160 112 0 60Z" fill="url(#line)" opacity="0.16"/>
+  <path d="M10 60 C180 20 780 20 950 60 C780 100 180 100 10 60Z" fill="url(#line)" opacity="0.30"/>
+  <path d="M22 60 C205 34 755 34 938 60 C755 86 205 86 22 60Z" fill="url(#line)" opacity="0.44"/>
 </svg>

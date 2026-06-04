@@ -10,6 +10,7 @@ import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
 import 'package:tictactoe/core/design_system/tokens/app_typography.dart';
 import 'package:tictactoe/core/design_system/widgets/app_haptics.dart';
 import 'package:tictactoe/core/design_system/widgets/chrome_corner_flourish.dart';
+import 'package:tictactoe/core/design_system/widgets/glyph_safe_text.dart';
 import 'package:tictactoe/core/design_system/widgets/selection_glow.dart';
 
 Future<T?> showActionDialog<T>({
@@ -324,7 +325,7 @@ class _ActionButton extends HookWidget {
                       color: AppPalette.ivoryText.withValues(alpha: 0.12),
                     ),
                   ),
-                Text(
+                GlyphSafeText(
                   action.label,
                   textAlign: TextAlign.center,
                   maxLines: 1,
