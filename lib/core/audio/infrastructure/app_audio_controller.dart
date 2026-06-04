@@ -7,9 +7,9 @@ import 'package:tictactoe/core/audio/domain/entities/music_track.dart';
 import 'package:tictactoe/core/audio/domain/repositories/audio_preferences_repository.dart';
 import 'package:tictactoe/core/audio/domain/services/audio_controller.dart';
 import 'package:tictactoe/core/audio/domain/services/audio_preferences_controller.dart';
+import 'package:tictactoe/core/audio/infrastructure/audio_asset_catalog.dart';
 import 'package:tictactoe/core/audio/infrastructure/music_player.dart';
 import 'package:tictactoe/core/audio/infrastructure/sfx_player.dart';
-import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
 import 'package:tictactoe/core/di/audio_dependencies.dart';
 
 part 'app_audio_controller.g.dart';
@@ -17,46 +17,13 @@ part 'app_audio_controller.g.dart';
 @Riverpod(keepAlive: true)
 final class AppAudioController extends _$AppAudioController
     implements AudioController, AudioPreferencesController {
-  static const _menuTransition = Duration(milliseconds: 420);
-  static const _gameTransition = Duration(seconds: 5);
-  static const _menuStartOffset = Duration(seconds: 12);
-
-  static const _trackAssets = <MusicTrack, String>{
-    MusicTrack.menu: AppAssets.musicLoop,
-    MusicTrack.game: AppAssets.gameMusic,
-  };
-
-  static const _trackTransitions = <MusicTrack, Duration>{
-    MusicTrack.menu: _menuTransition,
-    MusicTrack.game: _gameTransition,
-  };
-
-  static const _trackStartOffsets = <MusicTrack, Duration>{
-    MusicTrack.menu: _menuStartOffset,
-    MusicTrack.game: Duration.zero,
-  };
-
-  static const _menuSfxAssets = <MenuSfx, _SfxBinding>{
-    MenuSfx.select: _SfxBinding(AppAssets.selection, 0.78),
-    MenuSfx.activate: _SfxBinding(AppAssets.titleStart, 0.86),
-    MenuSfx.reset: _SfxBinding(AppAssets.restartGrace, 0.86),
-  };
-
-  static const _warmUpAssets = <String>[
-    AppAssets.titleStart,
-    AppAssets.selection,
-    AppAssets.parry,
-    AppAssets.victory,
-    AppAssets.deathIntro,
-    AppAssets.death,
-    AppAssets.criticalHit,
-    AppAssets.restartGrace,
-  ];
+  static const _assets = AudioAssetCatalog();
 
   late final AudioPreferencesRepository _repository;
   late final MusicPlayer _musicPlayer;
   late final SfxPlayer _sfxPlayer;
   MusicTrack? _pendingTrack;
+  var _requestedTrack = MusicTrack.menu;
   var _settingsLoaded = false;
   var _disposed = false;
 
@@ -74,6 +41,7 @@ final class AppAudioController extends _$AppAudioController
 
   @override
   Future<void> playTrack(MusicTrack track) {
+    _requestedTrack = track;
     if (_disposed) {
       return Future<void>.value();
     }
@@ -91,11 +59,12 @@ final class AppAudioController extends _$AppAudioController
   }
 
   Future<void> _playTrackNow(MusicTrack track) {
+    final binding = _assets.track(track);
     return _musicPlayer.play(
-      _trackAssets[track]!,
+      binding.asset,
       targetVolume: state.musicVolume,
-      transitionDuration: _trackTransitions[track]!,
-      startAt: _trackStartOffsets[track]!,
+      transitionDuration: binding.transitionDuration,
+      startAt: binding.startAt,
     );
   }
 
@@ -105,7 +74,10 @@ final class AppAudioController extends _$AppAudioController
       return Future<void>.value();
     }
 
-    return _musicPlayer.prepare(_trackAssets[MusicTrack.game]!);
+    final track = _requestedTrack == MusicTrack.menu
+        ? MusicTrack.recusants
+        : _requestedTrack;
+    return _musicPlayer.prepare(_assets.track(track).asset);
   }
 
   @override
@@ -116,38 +88,48 @@ final class AppAudioController extends _$AppAudioController
 
   @override
   Future<void> playMenuSfx(MenuSfx intent) {
-    final binding = _menuSfxAssets[intent]!;
-    return _playSfx(binding.asset, volumeMultiplier: binding.volumeMultiplier);
+    final binding = _assets.menuSfx(intent);
+    return _playSfx(binding);
   }
 
   @override
-  Future<void> playMove({required bool isPlayerX}) {
-    return _playSfx(AppAssets.selection, volumeMultiplier: 0.46);
+  Future<void> playHumanMark() {
+    return _playSfx(AudioAssetCatalog.humanMark);
+  }
+
+  @override
+  Future<void> playCpuMark() {
+    return _playSfx(AudioAssetCatalog.cpuMark);
+  }
+
+  @override
+  Future<void> playMaleniaVictoryLine() {
+    return _playSfx(AudioAssetCatalog.maleniaVictoryLine);
   }
 
   @override
   Future<void> playParry() {
-    return _playSfx(AppAssets.parry, volumeMultiplier: 0.74);
+    return _playSfx(AudioAssetCatalog.parry);
   }
 
   @override
   Future<void> playVictory() {
-    return _playSfx(AppAssets.victory, volumeMultiplier: 0.9);
+    return _playSfx(AudioAssetCatalog.victory);
   }
 
   @override
   Future<void> playDeathIntro() {
-    return _playSfx(AppAssets.deathIntro, volumeMultiplier: 0.86);
+    return _playSfx(AudioAssetCatalog.deathIntro);
   }
 
   @override
   Future<void> playDeath() {
-    return _playSfx(AppAssets.death, volumeMultiplier: 0.92);
+    return _playSfx(AudioAssetCatalog.death);
   }
 
   @override
   Future<void> playDraw() {
-    return _playSfx(AppAssets.criticalHit, volumeMultiplier: 0.86);
+    return _playSfx(AudioAssetCatalog.draw);
   }
 
   @override
@@ -186,7 +168,7 @@ final class AppAudioController extends _$AppAudioController
     }
 
     _settingsLoaded = true;
-    unawaited(_sfxPlayer.warmUp(_warmUpAssets));
+    unawaited(_sfxPlayer.warmUp(AudioAssetCatalog.warmUpAssets));
     if (state.musicEnabled) {
       final track = _pendingTrack ?? MusicTrack.menu;
       _pendingTrack = null;
@@ -197,14 +179,16 @@ final class AppAudioController extends _$AppAudioController
     }
   }
 
-  Future<void> _playSfx(String asset, {required double volumeMultiplier}) {
+  Future<void> _playSfx(AudioSfxBinding binding) {
     if (_disposed || !state.sfxEnabled) {
       return Future<void>.value();
     }
 
     return _sfxPlayer.play(
-      asset,
-      volume: state.effectiveSfxVolume(volumeMultiplier: volumeMultiplier),
+      binding.asset,
+      volume: state.effectiveSfxVolume(
+        volumeMultiplier: binding.volumeMultiplier,
+      ),
     );
   }
 
@@ -213,11 +197,4 @@ final class AppAudioController extends _$AppAudioController
     unawaited(_musicPlayer.dispose());
     unawaited(_sfxPlayer.dispose());
   }
-}
-
-final class _SfxBinding {
-  const _SfxBinding(this.asset, this.volumeMultiplier);
-
-  final String asset;
-  final double volumeMultiplier;
 }

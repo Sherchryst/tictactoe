@@ -1,59 +1,43 @@
-import 'dart:async';
-import 'dart:convert';
-
+import 'package:tictactoe/core/async/serial_task_queue.dart';
 import 'package:tictactoe/core/audio/domain/entities/audio_preferences.dart';
 import 'package:tictactoe/core/audio/domain/repositories/audio_preferences_repository.dart';
+import 'package:tictactoe/core/storage/json_key_value_store.dart';
 import 'package:tictactoe/core/storage/key_value_storage.dart';
 
 final class LocalAudioPreferencesRepository
     implements AudioPreferencesRepository {
-  LocalAudioPreferencesRepository(this._storage);
+  LocalAudioPreferencesRepository(KeyValueStorage storage)
+    : _jsonStore = JsonKeyValueStore(storage);
 
   static const _audioPreferencesKey = 'audio_preferences';
   static const _legacyAudioPreferencesKey = 'eldenAudioPreferences';
 
-  final KeyValueStorage _storage;
-  Future<void> _pendingWrite = Future<void>.value();
+  final JsonKeyValueStore _jsonStore;
+  final _pendingWrite = SerialTaskQueue();
 
   @override
   Future<AudioPreferences> load() async {
     final json =
-        await _readJson(_audioPreferencesKey) ??
-        await _readJson(_legacyAudioPreferencesKey);
-    if (json == null) {
-      return const AudioPreferences();
-    }
+        await _jsonStore.readObject(
+          _audioPreferencesKey,
+          AudioPreferences.fromJson,
+        ) ??
+        await _jsonStore.readObject(
+          _legacyAudioPreferencesKey,
+          AudioPreferences.fromJson,
+        );
 
-    return AudioPreferences.fromJson(json);
+    return json ?? const AudioPreferences();
   }
 
   @override
   Future<void> save(AudioPreferences settings) {
-    final next = _pendingWrite.then((_) => _writeSettings(settings));
-    _pendingWrite = next.catchError((_) {});
-    return next;
-  }
-
-  Future<Map<String, Object?>?> _readJson(String key) async {
-    try {
-      final raw = await _storage.readString(key);
-      if (raw == null) {
-        return null;
-      }
-
-      final value = jsonDecode(raw);
-      return value is Map<String, Object?> ? value : null;
-    } catch (_) {
-      return null;
-    }
+    return _pendingWrite.enqueue(() => _writeSettings(settings));
   }
 
   Future<void> _writeSettings(AudioPreferences settings) async {
     try {
-      await _storage.writeString(
-        _audioPreferencesKey,
-        jsonEncode(settings.toJson()),
-      );
+      await _jsonStore.writeObject(_audioPreferencesKey, settings.toJson());
     } catch (_) {}
   }
 }

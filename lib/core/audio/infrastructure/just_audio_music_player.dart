@@ -107,6 +107,10 @@ final class JustAudioMusicPlayer implements MusicPlayer {
       return;
     }
 
+    if (_player.playing) {
+      return;
+    }
+
     final transitionId = ++_transitionId;
     _loadingAsset = asset;
     try {

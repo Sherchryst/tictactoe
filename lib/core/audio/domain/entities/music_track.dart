@@ -1,1 +1,1 @@
-enum MusicTrack { menu, game }
+enum MusicTrack { menu, recusants, radahn, mohg, malenia }

@@ -47,8 +47,8 @@ flutter:
     - assets/elden_ring/items/rune_arc_512.png
     - assets/elden_ring/items/golden_rune_1_512.png
     - assets/elden_ring/bosses/
-    - assets/elden_ring/audio/music/home_title__elden_ring_track_01_licensed.mp3
-    - assets/elden_ring/audio/music/malenia_blade_of_miquella_01.mp3
+    - assets/elden_ring/audio/music/
+    - assets/elden_ring/audio/music/bosses/
     - assets/elden_ring/audio/sfx/title_start_01.mp3
     - assets/elden_ring/audio/sfx/selection_02.mp3
     - assets/elden_ring/audio/sfx/parry_01.mp3
@@ -57,6 +57,9 @@ flutter:
     - assets/elden_ring/audio/sfx/death_01.mp3
     - assets/elden_ring/audio/sfx/critical_hit_cut_01.mp3
     - assets/elden_ring/audio/sfx/restart_grace_01.mp3
+    - assets/elden_ring/audio/sfx/slash-sword.mp3
+    - assets/elden_ring/audio/sfx/flask-of-crimson-tears.mp3
+    - assets/elden_ring/audio/sfx/malenia-and-i-have-never.mp3
     - assets/elden_ring/vfx/title_menu_selection_glow.svg
   fonts:
     - family: Mantinia

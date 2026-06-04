@@ -12,7 +12,11 @@ abstract interface class AudioController {
 
   Future<void> stopMusic();
 
-  Future<void> playMove({required bool isPlayerX});
+  Future<void> playHumanMark();
+
+  Future<void> playCpuMark();
+
+  Future<void> playMaleniaVictoryLine();
 
   Future<void> playParry();
 

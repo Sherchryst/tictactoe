@@ -1,3 +1,5 @@
+import 'package:tictactoe/core/assets/audio_assets.dart';
+
 final class AppAssets {
   const AppAssets._();
 
@@ -10,22 +12,30 @@ final class AppAssets {
   static const flask = 'assets/elden_ring/items/flask_crimson_tears_4_512.png';
   static const runeArc = 'assets/elden_ring/items/rune_arc_512.png';
   static const statusRune = 'assets/elden_ring/items/golden_rune_1_512.png';
-  static const malenia = 'assets/elden_ring/bosses/malenia.webp';
 
-  static const musicLoop =
-      'assets/elden_ring/audio/music/home_title__elden_ring_track_01_licensed.mp3';
-  static const gameMusic =
-      'assets/elden_ring/audio/music/malenia_blade_of_miquella_01.mp3';
-  static const titleStart = 'assets/elden_ring/audio/sfx/title_start_01.mp3';
-  static const parry = 'assets/elden_ring/audio/sfx/parry_01.mp3';
-  static const victory = 'assets/elden_ring/audio/sfx/victory_01.mp3';
-  static const deathIntro = 'assets/elden_ring/audio/sfx/death_intro_01.mp3';
-  static const death = 'assets/elden_ring/audio/sfx/death_01.mp3';
-  static const criticalHit =
-      'assets/elden_ring/audio/sfx/critical_hit_cut_01.mp3';
-  static const selection = 'assets/elden_ring/audio/sfx/selection_02.mp3';
-  static const restartGrace =
-      'assets/elden_ring/audio/sfx/restart_grace_01.mp3';
+  static const radahn = 'assets/elden_ring/bosses/radahn.webp';
+  static const radahnDead = 'assets/elden_ring/bosses/radahn_dead.webp';
+  static const mohg = 'assets/elden_ring/bosses/mohg.webp';
+  static const mohgDead = 'assets/elden_ring/bosses/mohg_dead.webp';
+  static const malenia = 'assets/elden_ring/bosses/malenia.webp';
+  static const maleniaDead = 'assets/elden_ring/bosses/malenia_dead.webp';
+
+  static const musicLoop = AudioAssets.musicLoop;
+  static const recusantsMusic = AudioAssets.recusantsMusic;
+  static const radahnMusic = AudioAssets.radahnMusic;
+  static const mohgMusic = AudioAssets.mohgMusic;
+  static const maleniaMusic = AudioAssets.maleniaMusic;
+  static const titleStart = AudioAssets.titleStart;
+  static const parry = AudioAssets.parry;
+  static const victory = AudioAssets.victory;
+  static const deathIntro = AudioAssets.deathIntro;
+  static const death = AudioAssets.death;
+  static const criticalHit = AudioAssets.criticalHit;
+  static const selection = AudioAssets.selection;
+  static const slashSword = AudioAssets.slashSword;
+  static const flaskUse = AudioAssets.flaskUse;
+  static const maleniaVictoryLine = AudioAssets.maleniaVictoryLine;
+  static const restartGrace = AudioAssets.restartGrace;
 
   static const titleSelectionGlow =
       'assets/elden_ring/vfx/title_menu_selection_glow.svg';
