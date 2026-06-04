@@ -160,7 +160,7 @@ void main() {
     expect(find.text(en.touchScreenPrompt), findsOneWidget);
   });
 
-  testWidgets('pauses music when the app leaves the foreground', (
+  testWidgets('pauses and resumes music around background lifecycle', (
     tester,
   ) async {
     final audio = await pumpAppWithAudio(tester);
@@ -181,6 +181,9 @@ void main() {
 
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await tester.pump();
+
+    verify(audio.resumeMusic()).called(1);
+
     clearInteractions(audio);
 
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);

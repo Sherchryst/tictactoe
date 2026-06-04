@@ -10,6 +10,8 @@ abstract interface class AudioController {
 
   Future<void> pauseMusic();
 
+  Future<void> resumeMusic();
+
   Future<void> stopMusic();
 
   Future<void> playHumanMark();

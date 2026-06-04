@@ -161,6 +161,33 @@ void main() {
       },
     );
 
+    test('resumes the last requested music track', () async {
+      final repository = MockAudioPreferencesRepository();
+      final musicPlayer = MockMusicPlayer();
+      stubAudioPreferencesRepository(repository);
+      final container = createContainer(
+        repository: repository,
+        musicPlayer: musicPlayer,
+      );
+      final controller = container.read(appAudioControllerProvider.notifier);
+      await container.pump();
+      await Future<void>.delayed(Duration.zero);
+
+      await controller.playTrack(MusicTrack.mohg);
+      clearInteractions(musicPlayer);
+
+      await controller.resumeMusic();
+
+      verify(
+        musicPlayer.play(
+          AudioAssets.mohgMusic,
+          targetVolume: AudioPreferences.defaultMusicVolume,
+          transitionDuration: anyNamed('transitionDuration'),
+          startAt: Duration.zero,
+        ),
+      ).called(1);
+    });
+
     test('prepares Recusants by default for non-boss fights', () async {
       final repository = MockAudioPreferencesRepository();
       final musicPlayer = MockMusicPlayer();

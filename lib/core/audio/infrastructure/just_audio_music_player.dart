@@ -45,8 +45,27 @@ final class JustAudioMusicPlayer implements MusicPlayer {
         return;
       }
 
-      if (_currentAsset == asset && _player.playing) {
-        await _setVolume(targetVolume);
+      if (_currentAsset == asset) {
+        if (_player.playing) {
+          await _setVolume(targetVolume);
+          return;
+        }
+
+        await _setVolume(0);
+        if (!_isActiveTransition(transitionId)) {
+          return;
+        }
+
+        unawaited(
+          _player.play().onError((error, stackTrace) {
+            _logError('Music playback failed.', error, stackTrace);
+          }),
+        );
+        await _fade(
+          to: targetVolume,
+          duration: transitionDuration.inMilliseconds,
+          transitionId: transitionId,
+        );
         return;
       }
 
@@ -151,11 +170,15 @@ final class JustAudioMusicPlayer implements MusicPlayer {
   }) async {
     final transitionId = ++_transitionId;
     try {
-      await _fade(
+      final faded = await _fade(
         to: 0,
         duration: fadeDuration.inMilliseconds,
         transitionId: transitionId,
       );
+      if (!faded) {
+        return;
+      }
+
       await _player.pause();
     } catch (error, stackTrace) {
       _logError('Music playback could not be paused.', error, stackTrace);
@@ -168,11 +191,15 @@ final class JustAudioMusicPlayer implements MusicPlayer {
   }) async {
     final transitionId = ++_transitionId;
     try {
-      await _fade(
+      final faded = await _fade(
         to: 0,
         duration: fadeDuration.inMilliseconds,
         transitionId: transitionId,
       );
+      if (!faded) {
+        return;
+      }
+
       await _player.stop();
       _currentAsset = null;
     } catch (error, stackTrace) {

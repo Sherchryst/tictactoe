@@ -128,6 +128,15 @@ class MockAudioController extends _i1.Mock implements _i6.AudioController {
           as _i5.Future<void>);
 
   @override
+  _i5.Future<void> resumeMusic() =>
+      (super.noSuchMethod(
+            Invocation.method(#resumeMusic, []),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
   _i5.Future<void> stopMusic() =>
       (super.noSuchMethod(
             Invocation.method(#stopMusic, []),

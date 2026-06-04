@@ -84,6 +84,9 @@ final class AppAudioController extends _$AppAudioController
   Future<void> pauseMusic() => _musicPlayer.pause();
 
   @override
+  Future<void> resumeMusic() => playTrack(_requestedTrack);
+
+  @override
   Future<void> stopMusic() => _musicPlayer.stop();
 
   @override

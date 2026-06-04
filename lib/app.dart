@@ -30,6 +30,9 @@ class TicTacToeApp extends HookConsumerWidget {
 
     useOnAppLifecycleStateChange((_, current) {
       if (current == AppLifecycleState.resumed) {
+        if (musicPausedForBackground.value) {
+          unawaited(ref.read(audioControllerProvider).resumeMusic());
+        }
         musicPausedForBackground.value = false;
         return;
       }

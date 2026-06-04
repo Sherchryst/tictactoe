@@ -17,6 +17,7 @@ void stubAudioController(MockAudioController audio) {
   when(audio.playRestart()).thenAnswer((_) async {});
   when(audio.prepareGame()).thenAnswer((_) async {});
   when(audio.pauseMusic()).thenAnswer((_) async {});
+  when(audio.resumeMusic()).thenAnswer((_) async {});
   when(audio.stopMusic()).thenAnswer((_) async {});
   when(audio.playTrack(any)).thenAnswer((_) async {});
   when(audio.playMenuSfx(any)).thenAnswer((_) async {});
