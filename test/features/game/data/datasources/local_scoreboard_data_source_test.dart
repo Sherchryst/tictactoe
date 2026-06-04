@@ -17,37 +17,43 @@ void main() {
   });
 
   group('LocalScoreboardDataSource', () {
-    test('returns null when saved scoreboard json is incomplete', () async {
+    test('ignores the old scoreboard storage key', () async {
       when(
-        storage.readString('scoreboard'),
-      ).thenAnswer((_) async => '{"humanWins":1}');
+        storage.readString('no_mercy_scoreboard_v1'),
+      ).thenAnswer((_) async => null);
 
       expect(await dataSource.loadScoreboard(), isNull);
-      verify(storage.readString('scoreboard')).called(1);
+      verify(storage.readString('no_mercy_scoreboard_v1')).called(1);
       verifyNoMoreInteractions(storage);
     });
 
-    test(
-      'writes serialized scoreboard to the scoreboard storage key',
-      () async {
-        when(storage.writeString(any, any)).thenAnswer((_) async {});
+    test('writes serialized scoreboard to the No Mercy storage key', () async {
+      when(storage.writeString(any, any)).thenAnswer((_) async {});
 
-        await dataSource.saveScoreboard(
-          const ScoreboardDto(humanWins: 2, cpuWins: 1, draws: 3),
-        );
+      await dataSource.saveScoreboard(
+        const ScoreboardDto(
+          radahn: BossScoreDto(attempts: 2, humanWins: 1, cpuWins: 1, draws: 0),
+          mohg: BossScoreDto(attempts: 1, humanWins: 0, cpuWins: 0, draws: 1),
+          malenia: BossScoreDto(
+            attempts: 0,
+            humanWins: 0,
+            cpuWins: 0,
+            draws: 0,
+          ),
+        ),
+      );
 
-        final capturedJson =
-            verify(
-                  storage.writeString('scoreboard', captureAny),
-                ).captured.single
-                as String;
-        expect(jsonDecode(capturedJson), {
-          'humanWins': 2,
-          'cpuWins': 1,
-          'draws': 3,
-        });
-        verifyNoMoreInteractions(storage);
-      },
-    );
+      final capturedJson =
+          verify(
+                storage.writeString('no_mercy_scoreboard_v1', captureAny),
+              ).captured.single
+              as String;
+      expect(jsonDecode(capturedJson), {
+        'radahn': {'attempts': 2, 'humanWins': 1, 'cpuWins': 1, 'draws': 0},
+        'mohg': {'attempts': 1, 'humanWins': 0, 'cpuWins': 0, 'draws': 1},
+        'malenia': {'attempts': 0, 'humanWins': 0, 'cpuWins': 0, 'draws': 0},
+      });
+      verifyNoMoreInteractions(storage);
+    });
   });
 }
