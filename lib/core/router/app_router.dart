@@ -8,16 +8,12 @@ import 'package:tictactoe/core/design_system/tokens/app_curves.dart';
 import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
 import 'package:tictactoe/core/di/audio_providers.dart';
 import 'package:tictactoe/core/router/app_routes.dart';
-import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
-import 'package:tictactoe/features/game/presentation/controllers/game_controller.dart';
-import 'package:tictactoe/features/game/presentation/dialogs/scoreboard_dialog.dart';
+import 'package:tictactoe/features/game/presentation/pages/game_loading_page.dart';
 import 'package:tictactoe/features/game/presentation/pages/game_page.dart';
+import 'package:tictactoe/features/game/presentation/pages/home_page.dart';
+import 'package:tictactoe/features/launch/presentation/pages/splash_page.dart';
+import 'package:tictactoe/features/launch/presentation/pages/title_page.dart';
 import 'package:tictactoe/features/settings/presentation/pages/settings_page.dart';
-import 'package:tictactoe/features/shell/presentation/models/solo_challenge.dart';
-import 'package:tictactoe/features/shell/presentation/pages/game_loading_page.dart';
-import 'package:tictactoe/features/shell/presentation/pages/home_page.dart';
-import 'package:tictactoe/features/shell/presentation/pages/splash_page.dart';
-import 'package:tictactoe/features/shell/presentation/pages/title_page.dart';
 
 part 'app_router.g.dart';
 
@@ -32,10 +28,12 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.titlePath,
         pageBuilder: (context, state) {
+          final fromCredits = state.uri.queryParameters['fromCredits'] == '1';
+
           return _buildPageTransition(
             state: state,
-            child: const TitlePage(),
-            duration: AppDurations.routeTitle,
+            child: TitlePage(enableLogoHero: !fromCredits),
+            duration: fromCredits ? Duration.zero : AppDurations.routeTitle,
           );
         },
       ),
@@ -44,23 +42,7 @@ GoRouter appRouter(Ref ref) {
         pageBuilder: (context, state) {
           return _buildPageTransition(
             state: state,
-            child: HomePage(
-              onStartLocalDuel: (context) {
-                return _startGame(
-                  context: context,
-                  ref: ref,
-                  setup: const GameSetup(mode: GameMode.humanVsHuman),
-                );
-              },
-              onStartSoloChallenge: (context, challenge) {
-                return _startGame(
-                  context: context,
-                  ref: ref,
-                  setup: GameSetup(difficulty: _difficultyFor(challenge)),
-                );
-              },
-              onShowScoreboard: ScoreboardDialog.show,
-            ),
+            child: const HomePage(),
             duration: AppDurations.routeHome,
           );
         },
@@ -104,26 +86,6 @@ GoRouter appRouter(Ref ref) {
       ),
     ],
   );
-}
-
-Future<void> _startGame({
-  required BuildContext context,
-  required Ref ref,
-  required GameSetup setup,
-}) {
-  ref.read(gameControllerProvider.notifier).startGame(setup);
-  if (context.mounted) {
-    context.go(AppRoutes.gameLoadingLocation);
-  }
-
-  return Future<void>.value();
-}
-
-GameDifficulty _difficultyFor(SoloChallenge challenge) {
-  return switch (challenge) {
-    SoloChallenge.guided => GameDifficulty.easy,
-    SoloChallenge.noMercy => GameDifficulty.hard,
-  };
 }
 
 CustomTransitionPage<void> _buildPageTransition({

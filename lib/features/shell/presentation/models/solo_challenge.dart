@@ -1,1 +1,0 @@
-enum SoloChallenge { guided, noMercy }

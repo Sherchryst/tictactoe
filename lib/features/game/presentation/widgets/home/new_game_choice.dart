@@ -1,0 +1,1 @@
+enum NewGameChoice { guided, noMercy }

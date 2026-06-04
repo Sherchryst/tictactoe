@@ -10,6 +10,7 @@ final class AppRoutes {
 
   static const splashLocation = splashPath;
   static const titleLocation = titlePath;
+  static const titleFromCreditsLocation = '$titlePath?fromCredits=1';
   static const homeLocation = homePath;
   static const settingsLocation = settingsPath;
   static const gameLoadingLocation = gameLoadingPath;

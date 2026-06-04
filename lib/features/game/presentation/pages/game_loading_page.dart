@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tictactoe/core/audio/domain/entities/music_track.dart';
 import 'package:tictactoe/core/design_system/theme/app_palette.dart';
 import 'package:tictactoe/core/design_system/tokens/app_alphas.dart';
 import 'package:tictactoe/core/design_system/tokens/app_animations.dart';
@@ -21,8 +20,8 @@ import 'package:tictactoe/core/design_system/widgets/tic_tac_toe_title_logo.dart
 import 'package:tictactoe/core/di/audio_providers.dart';
 import 'package:tictactoe/core/router/app_routes.dart';
 import 'package:tictactoe/core/router/hero_tags.dart';
-import 'package:tictactoe/features/shell/presentation/rendering/loading_seal_ring_painter.dart';
-import 'package:tictactoe/features/shell/presentation/widgets/loading/loading_beam.dart';
+import 'package:tictactoe/features/game/presentation/utils/rendering/loading_seal_ring_painter.dart';
+import 'package:tictactoe/features/game/presentation/widgets/loading/loading_beam.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
 
 class GameLoadingPage extends HookConsumerWidget {
@@ -78,6 +77,7 @@ class GameLoadingPage extends HookConsumerWidget {
               animation: controller,
               screen: screen,
               logoFontSize: logoFontSize,
+              appTitle: l10n.appTitle,
               title: l10n.loadingTitle,
               footer: l10n.loadingFooter,
             ),
@@ -93,9 +93,7 @@ class GameLoadingPage extends HookConsumerWidget {
     AnimationController controller,
   ) async {
     final audio = ref.read(audioControllerProvider);
-    unawaited(
-      audio.prepareGame().then((_) => audio.playTrack(MusicTrack.game)),
-    );
+    unawaited(audio.prepareGame());
 
     try {
       await controller.forward().orCancel;
@@ -116,6 +114,7 @@ class _LoadingForeground extends StatelessWidget {
     required this.animation,
     required this.screen,
     required this.logoFontSize,
+    required this.appTitle,
     required this.title,
     required this.footer,
   });
@@ -123,6 +122,7 @@ class _LoadingForeground extends StatelessWidget {
   final Animation<double> animation;
   final Size screen;
   final double logoFontSize;
+  final String appTitle;
   final String title;
   final String footer;
 
@@ -163,7 +163,10 @@ class _LoadingForeground extends StatelessWidget {
               right: 22,
               child: Hero(
                 tag: HeroTags.titleLogo,
-                child: TicTacToeTitleLogo(fontSize: logoFontSize),
+                child: TicTacToeTitleLogo(
+                  title: appTitle,
+                  fontSize: logoFontSize,
+                ),
               ),
             ),
             _LoadingContent(

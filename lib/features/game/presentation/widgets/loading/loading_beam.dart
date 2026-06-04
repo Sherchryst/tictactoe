@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'package:tictactoe/core/design_system/widgets/selection_glow.dart';
-import 'package:tictactoe/features/shell/presentation/rendering/loading_beam_painter.dart';
+import 'package:tictactoe/features/game/presentation/utils/rendering/loading_beam_painter.dart';
 
 class LoadingBeam extends StatelessWidget {
   const LoadingBeam({required this.progress, super.key});

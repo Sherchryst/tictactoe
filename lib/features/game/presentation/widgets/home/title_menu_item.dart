@@ -6,7 +6,7 @@ import 'package:tictactoe/core/design_system/tokens/app_typography.dart';
 import 'package:tictactoe/core/design_system/widgets/app_haptics.dart';
 import 'package:tictactoe/core/design_system/widgets/app_pressable.dart';
 import 'package:tictactoe/core/design_system/widgets/menu_selection_beam.dart';
-import 'package:tictactoe/features/shell/presentation/widgets/home/home_menu_action.dart';
+import 'package:tictactoe/features/game/presentation/widgets/home/home_menu_action.dart';
 
 class TitleMenuItem extends StatelessWidget {
   const TitleMenuItem({

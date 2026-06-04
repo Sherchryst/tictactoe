@@ -4,20 +4,33 @@ import 'package:flutter/material.dart';
 import 'package:tictactoe/core/design_system/tokens/app_animations.dart';
 import 'package:tictactoe/core/design_system/widgets/tic_tac_toe_title_logo.dart';
 import 'package:tictactoe/core/router/hero_tags.dart';
-import 'package:tictactoe/features/shell/presentation/widgets/title/title_logo_prelude_glow.dart';
+import 'package:tictactoe/features/launch/presentation/widgets/title/title_logo_prelude_glow.dart';
+import 'package:tictactoe/l10n/app_localizations.dart';
 
 class TitleLogoIntro extends StatelessWidget {
-  const TitleLogoIntro({required this.controller, super.key});
+  const TitleLogoIntro({
+    required this.controller,
+    this.enableHero = true,
+    super.key,
+  });
 
   final AnimationController controller;
+  final bool enableHero;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return AnimatedBuilder(
       animation: controller,
       builder: (context, child) =>
           _TitleLogoIntroFrame(progress: controller.value, child: child!),
-      child: const Hero(tag: HeroTags.titleLogo, child: TicTacToeTitleLogo()),
+      child: enableHero
+          ? Hero(
+              tag: HeroTags.titleLogo,
+              child: TicTacToeTitleLogo(title: l10n.appTitle),
+            )
+          : TicTacToeTitleLogo(title: l10n.appTitle),
     );
   }
 }

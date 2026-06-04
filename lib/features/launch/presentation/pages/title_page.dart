@@ -11,13 +11,15 @@ import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
 import 'package:tictactoe/core/design_system/widgets/ambient_motes.dart';
 import 'package:tictactoe/core/di/audio_providers.dart';
 import 'package:tictactoe/core/router/app_routes.dart';
-import 'package:tictactoe/features/shell/presentation/widgets/title/title_background.dart';
-import 'package:tictactoe/features/shell/presentation/widgets/title/title_logo_intro.dart';
-import 'package:tictactoe/features/shell/presentation/widgets/title/title_touch_prompt.dart';
+import 'package:tictactoe/features/launch/presentation/widgets/title/title_background.dart';
+import 'package:tictactoe/features/launch/presentation/widgets/title/title_logo_intro.dart';
+import 'package:tictactoe/features/launch/presentation/widgets/title/title_touch_prompt.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
 
 class TitlePage extends HookConsumerWidget {
-  const TitlePage({super.key});
+  const TitlePage({this.enableLogoHero = true, super.key});
+
+  final bool enableLogoHero;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -120,7 +122,10 @@ class TitlePage extends HookConsumerWidget {
                   top: logoTop,
                   left: 20,
                   right: 20,
-                  child: TitleLogoIntro(controller: logoController),
+                  child: TitleLogoIntro(
+                    controller: logoController,
+                    enableHero: enableLogoHero,
+                  ),
                 ),
                 if (promptVisible.value)
                   Positioned(
