@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tictactoe/features/settings/data/models/app_preferences_dto.dart';
-import 'package:tictactoe/features/settings/domain/entities/app_preferences.dart';
+import 'package:tictactoe/core/preferences/data/models/app_preferences_dto.dart';
+import 'package:tictactoe/core/preferences/domain/entities/app_preferences.dart';
 
 void main() {
   test('maps preferences between domain and json', () {

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tictactoe/features/settings/data/datasources/local_app_preferences_data_source.dart';
-import 'package:tictactoe/features/settings/data/repositories/local_app_preferences_repository.dart';
-import 'package:tictactoe/features/settings/domain/entities/app_preferences.dart';
+import 'package:tictactoe/core/preferences/data/datasources/local_app_preferences_data_source.dart';
+import 'package:tictactoe/core/preferences/data/repositories/local_app_preferences_repository.dart';
+import 'package:tictactoe/core/preferences/domain/entities/app_preferences.dart';
 
 import '../../../../testing/in_memory_key_value_storage.dart';
 

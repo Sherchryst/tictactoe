@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:tictactoe/features/settings/data/datasources/local_app_preferences_data_source.dart';
-import 'package:tictactoe/features/settings/data/models/app_preferences_dto.dart';
-import 'package:tictactoe/features/settings/domain/entities/app_preferences.dart';
+import 'package:tictactoe/core/preferences/data/datasources/local_app_preferences_data_source.dart';
+import 'package:tictactoe/core/preferences/data/models/app_preferences_dto.dart';
+import 'package:tictactoe/core/preferences/domain/entities/app_preferences.dart';
 
 import '../../../../testing/mocks.mocks.dart';
 
@@ -34,7 +34,10 @@ void main() {
         when(storage.writeString(any, any)).thenAnswer((_) async {});
 
         await dataSource.savePreferences(
-          const AppPreferencesDto(localePreference: AppLocalePreference.french),
+          const AppPreferencesDto(
+            localePreference: AppLocalePreference.french,
+            confirmScoreReset: false,
+          ),
         );
 
         final capturedJson =
@@ -42,7 +45,10 @@ void main() {
                   storage.writeString('app_preferences', captureAny),
                 ).captured.single
                 as String;
-        expect(jsonDecode(capturedJson), {'localePreference': 'french'});
+        expect(jsonDecode(capturedJson), {
+          'localePreference': 'french',
+          'confirmScoreReset': false,
+        });
         verifyNoMoreInteractions(storage);
       },
     );
