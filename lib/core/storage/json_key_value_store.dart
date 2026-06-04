@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:tictactoe/core/logging/app_logger.dart';
 import 'package:tictactoe/core/storage/key_value_storage.dart';
 
 final class JsonKeyValueStore {
@@ -16,7 +17,7 @@ final class JsonKeyValueStore {
       return null;
     }
 
-    return decodeObject(raw, fromJson);
+    return decodeObject(raw, fromJson, key: key);
   }
 
   Future<void> writeObject(String key, Map<String, Object?> json) {
@@ -27,15 +28,29 @@ final class JsonKeyValueStore {
     return _storage.remove(key);
   }
 
-  T? decodeObject<T>(String raw, T Function(Map<String, dynamic>) fromJson) {
+  T? decodeObject<T>(
+    String raw,
+    T Function(Map<String, dynamic>) fromJson, {
+    String? key,
+  }) {
     try {
       final decoded = jsonDecode(raw);
       if (decoded is! Map<String, dynamic>) {
+        AppLogger.warning(
+          'Stored JSON value is not an object.',
+          name: 'tictactoe.storage',
+        );
         return null;
       }
 
       return fromJson(decoded);
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.warning(
+        'Stored JSON value could not be decoded${key == null ? '' : ' for "$key"'}.',
+        name: 'tictactoe.storage',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }

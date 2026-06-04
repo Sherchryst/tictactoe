@@ -1,5 +1,7 @@
 import 'package:flutter/services.dart';
 
+import 'package:tictactoe/core/logging/app_logger.dart';
+
 final class AudioAssetCache {
   AudioAssetCache({AssetBundle? bundle}) : _bundle = bundle ?? rootBundle;
 
@@ -17,8 +19,14 @@ final class AudioAssetCache {
       final exists = data.lengthInBytes > 0;
       _cache[asset] = exists;
       return exists;
-    } catch (_) {
+    } catch (error, stackTrace) {
       _cache[asset] = false;
+      AppLogger.warning(
+        'Audio asset could not be loaded: $asset',
+        name: 'tictactoe.audio.assets',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return false;
     }
   }

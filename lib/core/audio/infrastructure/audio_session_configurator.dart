@@ -1,5 +1,7 @@
 import 'package:audio_session/audio_session.dart';
 
+import 'package:tictactoe/core/logging/app_logger.dart';
+
 final class AudioSessionConfigurator {
   AudioSessionConfigurator({
     AudioSessionConfiguration configuration =
@@ -18,6 +20,13 @@ final class AudioSessionConfigurator {
       final session = await AudioSession.instance;
       await session.configure(_configuration);
       _configured = true;
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      AppLogger.warning(
+        'Audio session could not be configured.',
+        name: 'tictactoe.audio.session',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:tictactoe/core/async/serial_task_queue.dart';
 import 'package:tictactoe/core/audio/domain/entities/audio_preferences.dart';
 import 'package:tictactoe/core/audio/domain/repositories/audio_preferences_repository.dart';
+import 'package:tictactoe/core/logging/app_logger.dart';
 import 'package:tictactoe/core/storage/json_key_value_store.dart';
 import 'package:tictactoe/core/storage/key_value_storage.dart';
 
@@ -38,6 +39,13 @@ final class LocalAudioPreferencesRepository
   Future<void> _writeSettings(AudioPreferences settings) async {
     try {
       await _jsonStore.writeObject(_audioPreferencesKey, settings.toJson());
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      AppLogger.warning(
+        'Audio preferences could not be persisted.',
+        name: 'tictactoe.audio.preferences',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
   }
 }

@@ -6,6 +6,7 @@ import 'package:just_audio/just_audio.dart' as just_audio;
 import 'package:tictactoe/core/audio/domain/entities/audio_preferences.dart';
 import 'package:tictactoe/core/audio/infrastructure/audio_session_configurator.dart';
 import 'package:tictactoe/core/audio/infrastructure/music_player.dart';
+import 'package:tictactoe/core/logging/app_logger.dart';
 
 final class JustAudioMusicPlayer implements MusicPlayer {
   JustAudioMusicPlayer({
@@ -87,13 +88,18 @@ final class JustAudioMusicPlayer implements MusicPlayer {
 
       _currentAsset = asset;
       await _setVolume(0);
-      unawaited(_player.play().onError((_, _) {}));
+      unawaited(
+        _player.play().onError((error, stackTrace) {
+          _logError('Music playback failed.', error, stackTrace);
+        }),
+      );
       await _fade(
         to: targetVolume,
         duration: fadeInDuration,
         transitionId: transitionId,
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      _logError('Music track could not be started: $asset', error, stackTrace);
     } finally {
       if (_loadingAsset == asset) {
         _loadingAsset = null;
@@ -130,7 +136,8 @@ final class JustAudioMusicPlayer implements MusicPlayer {
       if (_player.playing) {
         await _player.pause();
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      _logError('Music track could not be prepared: $asset', error, stackTrace);
     } finally {
       if (_loadingAsset == asset) {
         _loadingAsset = null;
@@ -150,7 +157,9 @@ final class JustAudioMusicPlayer implements MusicPlayer {
         transitionId: transitionId,
       );
       await _player.pause();
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      _logError('Music playback could not be paused.', error, stackTrace);
+    }
   }
 
   @override
@@ -166,14 +175,18 @@ final class JustAudioMusicPlayer implements MusicPlayer {
       );
       await _player.stop();
       _currentAsset = null;
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      _logError('Music playback could not be stopped.', error, stackTrace);
+    }
   }
 
   @override
   Future<void> setVolume(double volume) async {
     try {
       await _setVolume(volume);
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      _logError('Music volume could not be changed.', error, stackTrace);
+    }
   }
 
   @override
@@ -181,7 +194,9 @@ final class JustAudioMusicPlayer implements MusicPlayer {
     _disposed = true;
     try {
       await _player.dispose();
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      _logError('Music player could not be disposed.', error, stackTrace);
+    }
   }
 
   Future<void> _setVolume(double volume) {
@@ -190,6 +205,15 @@ final class JustAudioMusicPlayer implements MusicPlayer {
 
   bool _isActiveTransition(int transitionId) {
     return !_disposed && transitionId == _transitionId;
+  }
+
+  void _logError(String message, Object? error, StackTrace stackTrace) {
+    AppLogger.warning(
+      message,
+      name: 'tictactoe.audio.music',
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 
   Future<bool> _fade({

@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart' as just_audio;
 
 import 'package:tictactoe/core/audio/infrastructure/audio_asset_cache.dart';
 import 'package:tictactoe/core/audio/infrastructure/sfx_player.dart';
+import 'package:tictactoe/core/logging/app_logger.dart';
 
 final class JustAudioSfxPlayer implements SfxPlayer {
   JustAudioSfxPlayer({
@@ -37,8 +38,14 @@ final class JustAudioSfxPlayer implements SfxPlayer {
       await player.setVolume(volume);
       await player.setAsset(asset);
       await player.seek(Duration.zero);
-      unawaited(player.play().onError((_, _) {}));
-    } catch (_) {}
+      unawaited(
+        player.play().onError((error, stackTrace) {
+          _logError('SFX playback failed: $asset', error, stackTrace);
+        }),
+      );
+    } catch (error, stackTrace) {
+      _logError('SFX could not be started: $asset', error, stackTrace);
+    }
   }
 
   @override
@@ -54,7 +61,18 @@ final class JustAudioSfxPlayer implements SfxPlayer {
     for (final player in _players) {
       try {
         await player.dispose();
-      } catch (_) {}
+      } catch (error, stackTrace) {
+        _logError('SFX player could not be disposed.', error, stackTrace);
+      }
     }
+  }
+
+  void _logError(String message, Object? error, StackTrace stackTrace) {
+    AppLogger.warning(
+      message,
+      name: 'tictactoe.audio.sfx',
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 }
