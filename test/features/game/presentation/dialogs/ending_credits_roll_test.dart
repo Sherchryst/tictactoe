@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tictactoe/core/design_system/theme/app_theme.dart';
-import 'package:tictactoe/features/game/presentation/dialogs/ending_credits_roll.dart';
+import 'package:tictactoe/features/game/presentation/widgets/dialogs/ending_credits_roll.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
 import 'package:tictactoe/l10n/app_localizations_en.dart';
 

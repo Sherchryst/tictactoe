@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tictactoe/core/design_system/theme/app_palette.dart';
 import 'package:tictactoe/core/design_system/tokens/app_durations.dart';
-import 'package:tictactoe/features/game/presentation/audio/game_audio_effects.dart';
+import 'package:tictactoe/features/game/presentation/utils/audio/game_audio_effects.dart';
 
 class SoloTrialBannerStyle {
   const SoloTrialBannerStyle({

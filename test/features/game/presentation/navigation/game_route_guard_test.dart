@@ -15,8 +15,8 @@ import 'package:tictactoe/features/game/domain/services/boss_pattern_catalog.dar
 import 'package:tictactoe/features/game/presentation/controllers/game_controller.dart';
 import 'package:tictactoe/features/game/presentation/controllers/game_timing.dart';
 import 'package:tictactoe/features/game/presentation/controllers/game_view_state.dart';
-import 'package:tictactoe/features/game/presentation/navigation/game_route_guard.dart';
 import 'package:tictactoe/features/game/presentation/pages/game_page.dart';
+import 'package:tictactoe/features/game/presentation/utils/navigation/game_route_guard.dart';
 import 'package:tictactoe/features/game/presentation/widgets/game_board.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
 

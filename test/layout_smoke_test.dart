@@ -10,11 +10,11 @@ import 'package:tictactoe/features/game/domain/entities/game_session.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/domain/entities/mark.dart';
 import 'package:tictactoe/features/game/presentation/controllers/game_controller.dart';
-import 'package:tictactoe/features/game/presentation/dialogs/difficulty_dialog.dart';
-import 'package:tictactoe/features/game/presentation/dialogs/game_over_dialog.dart';
-import 'package:tictactoe/features/game/presentation/dialogs/scoreboard_dialog.dart';
 import 'package:tictactoe/features/game/presentation/pages/game_page.dart';
 import 'package:tictactoe/features/game/presentation/pages/home_page.dart';
+import 'package:tictactoe/features/game/presentation/widgets/dialogs/difficulty_dialog.dart';
+import 'package:tictactoe/features/game/presentation/widgets/dialogs/game_over_dialog.dart';
+import 'package:tictactoe/features/game/presentation/widgets/dialogs/scoreboard_dialog.dart';
 import 'package:tictactoe/features/settings/presentation/pages/settings_page.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
 

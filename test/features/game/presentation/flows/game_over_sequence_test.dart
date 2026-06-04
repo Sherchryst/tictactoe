@@ -13,11 +13,11 @@ import 'package:tictactoe/features/game/domain/entities/game_session.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/domain/entities/mark.dart';
 import 'package:tictactoe/features/game/domain/services/boss_pattern_catalog.dart';
-import 'package:tictactoe/features/game/presentation/audio/game_audio_effects.dart';
 import 'package:tictactoe/features/game/presentation/controllers/game_controller.dart';
 import 'package:tictactoe/features/game/presentation/controllers/game_timing.dart';
-import 'package:tictactoe/features/game/presentation/dialogs/ending_credits_roll.dart';
-import 'package:tictactoe/features/game/presentation/flows/game_over_sequence.dart';
+import 'package:tictactoe/features/game/presentation/utils/audio/game_audio_effects.dart';
+import 'package:tictactoe/features/game/presentation/utils/flows/game_over_sequence.dart';
+import 'package:tictactoe/features/game/presentation/widgets/dialogs/ending_credits_roll.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
 import 'package:tictactoe/l10n/app_localizations_en.dart';
 

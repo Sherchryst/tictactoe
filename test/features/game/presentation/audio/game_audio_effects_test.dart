@@ -6,7 +6,7 @@ import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/domain/entities/game_session.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/domain/entities/mark.dart';
-import 'package:tictactoe/features/game/presentation/audio/game_audio_effects.dart';
+import 'package:tictactoe/features/game/presentation/utils/audio/game_audio_effects.dart';
 
 import '../../../../testing/mock_stubs.dart';
 import '../../../../testing/mocks.mocks.dart';

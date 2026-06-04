@@ -6,10 +6,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tictactoe/core/di/audio_providers.dart';
 import 'package:tictactoe/core/router/app_routes.dart';
 import 'package:tictactoe/features/game/domain/entities/game_session.dart';
-import 'package:tictactoe/features/game/presentation/audio/game_audio_effects.dart';
 import 'package:tictactoe/features/game/presentation/controllers/game_controller.dart';
-import 'package:tictactoe/features/game/presentation/dialogs/ending_credits_roll.dart';
-import 'package:tictactoe/features/game/presentation/dialogs/game_over_dialog.dart';
+import 'package:tictactoe/features/game/presentation/utils/audio/game_audio_effects.dart';
+import 'package:tictactoe/features/game/presentation/widgets/dialogs/ending_credits_roll.dart';
+import 'package:tictactoe/features/game/presentation/widgets/dialogs/game_over_dialog.dart';
 
 Future<void> runGameOverSequence({
   required BuildContext context,

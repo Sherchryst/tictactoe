@@ -10,7 +10,7 @@ import 'package:tictactoe/features/game/domain/entities/game_session.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
 import 'package:tictactoe/features/game/domain/entities/mark.dart';
 import 'package:tictactoe/features/game/domain/services/no_mercy_run_rules.dart';
-import 'package:tictactoe/features/game/presentation/dialogs/game_over_dialog.dart';
+import 'package:tictactoe/features/game/presentation/widgets/dialogs/game_over_dialog.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
 import 'package:tictactoe/l10n/app_localizations_en.dart';
 

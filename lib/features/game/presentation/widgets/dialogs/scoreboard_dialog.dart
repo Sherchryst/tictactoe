@@ -8,8 +8,8 @@ import 'package:tictactoe/core/di/audio_providers.dart';
 import 'package:tictactoe/core/preferences/application/controllers/app_preferences_controller.dart';
 import 'package:tictactoe/features/game/domain/entities/scoreboard.dart';
 import 'package:tictactoe/features/game/presentation/controllers/scoreboard_controller.dart';
-import 'package:tictactoe/features/game/presentation/dialogs/score_reset_confirmation_dialog.dart';
 import 'package:tictactoe/features/game/presentation/utils/text/score_help_resolver.dart';
+import 'package:tictactoe/features/game/presentation/widgets/dialogs/score_reset_confirmation_dialog.dart';
 import 'package:tictactoe/features/game/presentation/widgets/tarnished_record_metrics.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
 

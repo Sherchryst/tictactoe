@@ -4,7 +4,7 @@ import 'package:tictactoe/core/design_system/tokens/app_assets.dart';
 import 'package:tictactoe/features/game/domain/entities/cpu_boss.dart';
 import 'package:tictactoe/features/game/domain/entities/game_session.dart';
 import 'package:tictactoe/features/game/domain/entities/game_setup.dart';
-import 'package:tictactoe/features/game/presentation/audio/game_audio_effects.dart';
+import 'package:tictactoe/features/game/presentation/utils/audio/game_audio_effects.dart';
 import 'package:tictactoe/features/game/presentation/widgets/boss_rune_intro.dart';
 
 void main() {

@@ -8,7 +8,7 @@ import 'package:tictactoe/core/preferences/application/controllers/app_preferenc
 import 'package:tictactoe/features/game/domain/entities/cpu_boss.dart';
 import 'package:tictactoe/features/game/domain/entities/game_result.dart';
 import 'package:tictactoe/features/game/presentation/controllers/scoreboard_controller.dart';
-import 'package:tictactoe/features/game/presentation/dialogs/scoreboard_dialog.dart';
+import 'package:tictactoe/features/game/presentation/widgets/dialogs/scoreboard_dialog.dart';
 import 'package:tictactoe/l10n/app_localizations.dart';
 import 'package:tictactoe/l10n/app_localizations_en.dart';
 

@@ -8,7 +8,7 @@ import 'package:tictactoe/core/design_system/tokens/app_breakpoints.dart';
 import 'package:tictactoe/core/design_system/tokens/app_curves.dart';
 import 'package:tictactoe/core/design_system/tokens/app_spacing.dart';
 import 'package:tictactoe/features/game/domain/entities/game_session.dart';
-import 'package:tictactoe/features/game/presentation/audio/game_audio_effects.dart';
+import 'package:tictactoe/features/game/presentation/utils/audio/game_audio_effects.dart';
 import 'package:tictactoe/features/game/presentation/utils/bosses/boss_presentation.dart';
 import 'package:tictactoe/features/game/presentation/utils/rendering/boss_rune_intro_glow_painter.dart';
 import 'package:tictactoe/features/game/presentation/widgets/boss_rune_reveal_visual.dart';
