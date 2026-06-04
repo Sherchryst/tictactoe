@@ -1,5 +1,4 @@
-import 'package:tictactoe/features/game/domain/entities/board.dart';
-import 'package:tictactoe/features/game/domain/entities/player.dart';
+import 'package:tictactoe/features/game/domain/entities/game_session.dart';
 import 'package:tictactoe/features/game/domain/services/cpu_strategy.dart';
 
 final class QueueCpuStrategy implements CpuStrategy {
@@ -8,7 +7,7 @@ final class QueueCpuStrategy implements CpuStrategy {
   final List<int> _moves;
 
   @override
-  int chooseMove(Board board, Player player) {
+  int chooseMove(GameSession session) {
     return _moves.removeAt(0);
   }
 }

@@ -6,9 +6,9 @@ import 'package:tictactoe/core/audio/domain/entities/audio_preferences.dart';
 import 'mocks.mocks.dart';
 
 void stubAudioController(MockAudioController audio) {
-  when(
-    audio.playMove(isPlayerX: anyNamed('isPlayerX')),
-  ).thenAnswer((_) async {});
+  when(audio.playHumanMark()).thenAnswer((_) async {});
+  when(audio.playCpuMark()).thenAnswer((_) async {});
+  when(audio.playMaleniaVictoryLine()).thenAnswer((_) async {});
   when(audio.playParry()).thenAnswer((_) async {});
   when(audio.playVictory()).thenAnswer((_) async {});
   when(audio.playDeathIntro()).thenAnswer((_) async {});
@@ -62,5 +62,5 @@ void stubSfxPlayer(MockSfxPlayer sfxPlayer) {
 }
 
 void stubCpuStrategy(MockCpuStrategy strategy, {required int move}) {
-  when(strategy.chooseMove(any, any)).thenReturn(move);
+  when(strategy.chooseMove(any)).thenReturn(move);
 }

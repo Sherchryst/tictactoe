@@ -15,22 +15,23 @@ import 'package:tictactoe/core/audio/domain/repositories/audio_preferences_repos
     as _i9;
 import 'package:tictactoe/core/audio/domain/services/audio_controller.dart'
     as _i6;
-import 'package:tictactoe/core/audio/infrastructure/music_player.dart' as _i16;
+import 'package:tictactoe/core/audio/infrastructure/music_player.dart' as _i15;
 import 'package:tictactoe/core/audio/infrastructure/sfx_player.dart' as _i19;
-import 'package:tictactoe/core/storage/key_value_storage.dart' as _i15;
-import 'package:tictactoe/features/game/domain/entities/board.dart' as _i13;
+import 'package:tictactoe/core/preferences/domain/entities/app_preferences.dart'
+    as _i2;
+import 'package:tictactoe/core/preferences/domain/repositories/app_preferences_repository.dart'
+    as _i4;
+import 'package:tictactoe/core/storage/key_value_storage.dart' as _i14;
+import 'package:tictactoe/features/game/domain/entities/cpu_boss.dart' as _i17;
 import 'package:tictactoe/features/game/domain/entities/game_result.dart'
     as _i18;
-import 'package:tictactoe/features/game/domain/entities/player.dart' as _i14;
+import 'package:tictactoe/features/game/domain/entities/game_session.dart'
+    as _i13;
 import 'package:tictactoe/features/game/domain/entities/scoreboard.dart' as _i3;
 import 'package:tictactoe/features/game/domain/repositories/scoreboard_repository.dart'
-    as _i17;
+    as _i16;
 import 'package:tictactoe/features/game/domain/services/cpu_strategy.dart'
     as _i12;
-import 'package:tictactoe/features/settings/domain/entities/app_preferences.dart'
-    as _i2;
-import 'package:tictactoe/features/settings/domain/repositories/app_preferences_repository.dart'
-    as _i4;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -136,9 +137,27 @@ class MockAudioController extends _i1.Mock implements _i6.AudioController {
           as _i5.Future<void>);
 
   @override
-  _i5.Future<void> playMove({required bool? isPlayerX}) =>
+  _i5.Future<void> playHumanMark() =>
       (super.noSuchMethod(
-            Invocation.method(#playMove, [], {#isPlayerX: isPlayerX}),
+            Invocation.method(#playHumanMark, []),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> playCpuMark() =>
+      (super.noSuchMethod(
+            Invocation.method(#playCpuMark, []),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> playMaleniaVictoryLine() =>
+      (super.noSuchMethod(
+            Invocation.method(#playMaleniaVictoryLine, []),
             returnValue: _i5.Future<void>.value(),
             returnValueForMissingStub: _i5.Future<void>.value(),
           )
@@ -238,9 +257,9 @@ class MockAudioPreferencesRepository extends _i1.Mock
 /// See the documentation for Mockito's code generation for more information.
 class MockCpuStrategy extends _i1.Mock implements _i12.CpuStrategy {
   @override
-  int chooseMove(_i13.Board? board, _i14.Player? player) =>
+  int chooseMove(_i13.GameSession? session) =>
       (super.noSuchMethod(
-            Invocation.method(#chooseMove, [board, player]),
+            Invocation.method(#chooseMove, [session]),
             returnValue: 0,
             returnValueForMissingStub: 0,
           )
@@ -250,7 +269,7 @@ class MockCpuStrategy extends _i1.Mock implements _i12.CpuStrategy {
 /// A class which mocks [KeyValueStorage].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockKeyValueStorage extends _i1.Mock implements _i15.KeyValueStorage {
+class MockKeyValueStorage extends _i1.Mock implements _i14.KeyValueStorage {
   @override
   _i5.Future<String?> readString(String? key) =>
       (super.noSuchMethod(
@@ -282,7 +301,7 @@ class MockKeyValueStorage extends _i1.Mock implements _i15.KeyValueStorage {
 /// A class which mocks [MusicPlayer].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockMusicPlayer extends _i1.Mock implements _i16.MusicPlayer {
+class MockMusicPlayer extends _i1.Mock implements _i15.MusicPlayer {
   @override
   _i5.Future<void> play(
     String? asset, {
@@ -355,7 +374,7 @@ class MockMusicPlayer extends _i1.Mock implements _i16.MusicPlayer {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockScoreboardRepository extends _i1.Mock
-    implements _i17.ScoreboardRepository {
+    implements _i16.ScoreboardRepository {
   @override
   _i5.Future<_i3.Scoreboard> load() =>
       (super.noSuchMethod(
@@ -379,14 +398,23 @@ class MockScoreboardRepository extends _i1.Mock
           as _i5.Future<void>);
 
   @override
-  _i5.Future<_i3.Scoreboard> record(_i18.GameOutcome? outcome) =>
+  _i5.Future<_i3.Scoreboard> record(
+    _i17.CpuBossId? bossId,
+    _i18.GameOutcome? outcome,
+  ) =>
       (super.noSuchMethod(
-            Invocation.method(#record, [outcome]),
+            Invocation.method(#record, [bossId, outcome]),
             returnValue: _i5.Future<_i3.Scoreboard>.value(
-              _FakeScoreboard_1(this, Invocation.method(#record, [outcome])),
+              _FakeScoreboard_1(
+                this,
+                Invocation.method(#record, [bossId, outcome]),
+              ),
             ),
             returnValueForMissingStub: _i5.Future<_i3.Scoreboard>.value(
-              _FakeScoreboard_1(this, Invocation.method(#record, [outcome])),
+              _FakeScoreboard_1(
+                this,
+                Invocation.method(#record, [bossId, outcome]),
+              ),
             ),
           )
           as _i5.Future<_i3.Scoreboard>);
